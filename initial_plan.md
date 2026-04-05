@@ -11,9 +11,9 @@
 
 ### What the IP Does
 
-This project implements a hardware accelerator for **negacyclic polynomial multiplication** in the ring Z_q[x]/(x^n + 1), the core arithmetic primitive of the CRYSTALS-Kyber post-quantum key encapsulation mechanism (NIST PQC Standard, 2024).
+This project implements a hardware accelerator for **negacyclic polynomial multiplication** in the ring $ Z_q[x]/(x^n + 1)$, the core arithmetic primitive of the CRYSTALS-Kyber post-quantum key encapsulation mechanism (NIST PQC Standard, 2024).
 
-Classical public-key cryptography (RSA, ECDH) is vulnerable to quantum computers via Shor's algorithm. Kyber is a lattice-based scheme believed to be quantum-resistant, and is now standardized as ML-KEM (FIPS 203). Its performance bottleneck is repeated polynomial multiplication in the ring Z_3329[x]/(x^256 + 1). A single Kyber key exchange requires on the order of 20–30 such multiplications; each is O(n^2) naively but O(n log n) via the Number Theoretic Transform (NTT).
+Classical public-key cryptography (RSA, ECDH) is vulnerable to quantum computers via Shor's algorithm. Kyber is a lattice-based scheme believed to be quantum-resistant, and is now standardized as ML-KEM (FIPS 203). Its performance bottleneck is repeated polynomial multiplication in the ring $\mathbb{Z}_{3329}[x] / (x^{256} + 1)$. A single Kyber key exchange requires on the order of 20–30 such multiplications; each is O(n^2) naively but O(n log n) via the Number Theoretic Transform (NTT).
 
 The IP accelerates this bottleneck using a pipelined NTT-based multiply on the FPGA fabric, offloading the computation from the ARM processor. The PS runs the rest of the Kyber protocol in software; it calls the IP for every polynomial multiplication and receives the result back via shared memory.
 
@@ -174,6 +174,6 @@ Switching from dev to full parameters requires only regenerating the twiddle ROM
 
 ---
 
-## Stretch Goal: Kyber Wrapper
+## Extended Goal: Kyber Wrapper
 
 Once the NTT multiplication IP is verified, the PS-side Python code will be extended to implement the full Kyber key encapsulation protocol (key generation, encapsulation, decapsulation), calling the hardware IP for every polynomial multiply. This demonstrates end-to-end post-quantum key exchange with hardware-accelerated inner loops, and allows a direct software-only vs hardware-accelerated latency comparison.

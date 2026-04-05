@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# Vivado project files (regenerated from TCL)
+vivado/**
+!vivado/*.tcl
+!vivado/*.xdc
+
+# Vitis HLS project files
+hls/**/solution*/
+hls/**/.autopilot/
+hls/**/csim/
+hls/**/impl/
+
+# Simulation outputs
+sim/*.vcd
+sim/*.vvp
+sim/*.fst
+sim/*.log
+
+# Generated ROM files (regenerated from gen_twiddle.py)
+rtl/*.mem
+
+# Test vector files
+golden/*.txt
+golden/*.npy
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# PYNQ overlay artifacts
+*.bit
+*.hwh
+*.tcl.bak
