@@ -24,18 +24,19 @@ The initial implementation targets small, simulation-friendly parameters (n=4, q
 ```
 PS (ARM Cortex-A9)                     PL (FPGA Fabric)
 ─────────────────                      ────────────────
-Write a[0..n-1] → shared memory  ──►  
-Write b[0..n-1] → shared memory  ──►  
-Send START command via AXI-Lite  ──►   NTT-Mul IP
+Write a[0..n-1] → shared memory  ──>  
+Write b[0..n-1] → shared memory  ──>  
+Send START command via AXI-Lite  ──>   NTT-Mul IP
                                         ├── forward NTT on a
-Wait for DONE interrupt          ◄──    ├── forward NTT on b
-Read c[0..n-1] ← shared memory  ◄──    ├── pointwise multiply mod q
-                                        └── inverse NTT → c
+                                        ├── forward NTT on b
+                                        ├── pointwise multiply mod q
+Wait for DONE interrupt          <──    └── inverse NTT → c
+Read c[0..n-1] ← shared memory   <──                                        
 ```
 
 **Data transferred:**
 - Input: two coefficient vectors a[0..n-1] and b[0..n-1], each coefficient a 12-bit unsigned integer (fits q=3329 < 2^12)
-- Output: one coefficient vector c[0..n-1], same format
+- Output: one coefficient vector c[0..n-1], same format6
 - Control: a start signal and a done/status register, exposed via AXI-Lite
 
 **Interface:**
@@ -98,19 +99,19 @@ The IP is decomposed into four sub-modules, reflecting the four algorithmic phas
 ┌─────────────────────────────────────────────────────┐
 │                  NTT-Mul IP Core                    │
 │                                                     │
-│  ┌──────────┐   ┌──────────┐   ┌─────────────────┐ │
-│  │  Pre/Post│   │  NTT     │   │  Pointwise      │ │
-│  │  Twist   │──►│  Engine  │──►│  Multiplier     │ │
-│  │  Unit    │   │ (HLS)    │   │                 │ │
-│  └──────────┘   └──────────┘   └─────────────────┘ │
+│  ┌──────────┐   ┌──────────┐   ┌─────────────────┐  │
+│  │  Pre/Post│   │  NTT     │   │  Pointwise      │  │
+│  │  Twist   │──>│  Engine  │──>│  Multiplier     │  │
+│  │  Unit    │   │ (HLS)    │   │                 │  │
+│  └──────────┘   └──────────┘   └─────────────────┘  │
 │       ▲               │                │            │
 │       │         ┌─────▼──────┐         │            │
 │       │         │  Twiddle   │         │            │
 │       │         │  ROM       │         │            │
 │       │         └────────────┘         │            │
-│  ┌────┴─────────────────────────────────────────┐  │
-│  │           AXI-Lite Control / FSM (SV)        │  │
-│  └──────────────────────────────────────────────┘  │
+│  ┌────┴─────────────────────────────────────────┐   │
+│  │           AXI-Lite Control / FSM (SV)        │   │
+│  └──────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -136,14 +137,14 @@ A standalone modular multiply-reduce unit: given a, b, q, computes (a·b) mod q 
 Data flows through a ping-pong BRAM scheme:
 
 ```
-Shared BRAM A  ──►  Pre-Twist  ──►  NTT Engine  ──►  Shared BRAM B
+Shared BRAM A  ──>  Pre-Twist  ──>  NTT Engine  ──>  Shared BRAM B
                                                             │
-Shared BRAM B  ──►  NTT Engine (b)  ─────────────────►    │
+Shared BRAM B  ──>  NTT Engine (b)  ─────────────────>      │
                                                             ▼
                                                     Pointwise Multiply
                                                             │
                                                             ▼
-                                                    Shared BRAM C  ──►  INTT  ──►  Post-Twist  ──►  Output BRAM
+                                                    Shared BRAM C  ──>  INTT  ──>  Post-Twist  ──>  Output BRAM
 ```
 
 All inter-module data passes through on-chip BRAMs rather than streaming interfaces, keeping the design simple and debuggable. The FSM controls which BRAM ports are active at each stage. AXI4 or BRAM controller handles PS-side DMA into/out of the shared BRAMs.
