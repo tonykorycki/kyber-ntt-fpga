@@ -4,4 +4,4 @@
 // Uses HLS pragmas for pipelining and unrolling.
 
 #include "ntt_engine.h"
-#include "modmul.h"
+#include "barrett.h"
