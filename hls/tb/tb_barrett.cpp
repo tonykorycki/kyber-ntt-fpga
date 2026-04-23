@@ -10,10 +10,16 @@
 int main() {
     int failures = 0;
 
-    // TODO: for each a in [0, Q), for each b in [0, Q):
-    //   int expected = (a * b) % Q;
-    //   coef_t got = barrett_mul(a, b);
-    //   if (got != expected) { printf("FAIL: barrett_mul(%d,%d)=%d, expected %d\n",...); failures++; }
+    for (int a = 0; a < Q; a++) {
+        for (int b = 0; b < Q; b++) {
+            int expected = (a * b) % Q;
+            coef_t got = barrett_mul((coef_t)a, (coef_t)b);
+            if ((int)got != expected) {
+                printf("FAIL: barrett_mul(%d,%d)=%d, expected %d\n", a, b, (int)got, expected);
+                failures++;
+            }
+        }
+    }
 
     if (failures == 0)
         printf("tb_barrett: PASS (%d * %d = %d pairs tested)\n", Q, Q, Q * Q);

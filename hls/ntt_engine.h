@@ -13,4 +13,8 @@ constexpr int LOG2_N  = 2;
 typedef ap_uint<COEF_W>      coef_t;
 typedef ap_uint<2 * COEF_W>  prod_t;
 
+// Barrett reduction constants (derived from Q and COEF_W)
+constexpr int BARRETT_K = COEF_W;                        // ceil(log2(q)) == COEF_W by construction
+constexpr int BARRETT_M = (1 << (2 * BARRETT_K)) / Q;   // floor(4^k / q)
+
 #endif // NTT_ENGINE_H
