@@ -6,7 +6,7 @@
 //
 // Reads test vectors from golden/test_vectors.txt (relative path for C-sim).
 
-#include "../ntt_engine.h"
+#include "../src/ntt_engine.h"
 #include <cstdio>
 #include <cstdlib>
 

@@ -3,7 +3,7 @@
 // Exhaustive test: barrett_mul(a, b) == (a * b) % Q for all (a,b) in Z_Q^2.
 // Reads no external files — all 289 pairs (for q=17) computed inline.
 
-#include "../barrett.h"
+#include "../src/barrett.h"
 #include <cstdio>
 #include <cstdlib>
 

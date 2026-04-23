@@ -6,7 +6,7 @@
 // Reads all 16 (a, b, c) triples from golden/test_vectors.txt.
 // Exits with nonzero if any vector fails (Vitis HLS C-sim convention).
 
-#include "../ntt_top.h"
+#include "../src/ntt_top.h"
 #include <cstdio>
 #include <cstdlib>
 
