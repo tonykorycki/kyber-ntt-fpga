@@ -6,16 +6,17 @@ __pycache__/
 .venv/
 venv/
 
-# Vivado project files (regenerated from TCL)
-vivado/**
-!vivado/*.tcl
-!vivado/*.xdc
+# Vivado project files (regenerated from build.tcl — never commit project database)
+vivado/*.xpr
+vivado/*.jou
+vivado/*.str
+vivado/.Xil/
+vivado/ntt_project/
+vivado/ip_repo/*
+!vivado/ip_repo/.gitkeep
 
-# Vitis HLS project files
-hls/**/solution*/
-hls/**/.autopilot/
-hls/**/csim/
-hls/**/impl/
+# Build artifacts (all generated, never committed)
+build/
 
 # Simulation outputs
 sim/*.vcd
@@ -23,7 +24,10 @@ sim/*.vvp
 sim/*.fst
 sim/*.log
 
-# Generated ROM files (regenerated from gen_twiddle.py)
+# Generated files (regenerated — do not commit)
+hls/src/twiddle_rom.h
+vivado/twiddle_omega.coe
+vivado/twiddle_psi.coe
 rtl/*.mem
 
 # Test vector files
@@ -49,7 +53,11 @@ Thumbs.db
 # docs for me only
 assignment.md
 
+# Vitis session artifacts
+dfx_runtime.txt
+logs/
+
 # ai stuff
 *.log
-.claude/*
+.claude
 CLAUDE*
