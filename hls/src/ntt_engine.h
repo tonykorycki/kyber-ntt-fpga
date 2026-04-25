@@ -14,10 +14,10 @@
 #include <ap_int.h>
 
 // Retarget by editing only these four lines
-#define NTT_N       4       // polynomial degree        (full Kyber: 256)
+#define NTT_N       4       // polynomial degree        (full Kyber: 128)
 #define NTT_Q       17      // coefficient modulus      (full Kyber: 3329)
 #define NTT_COEF_W  5       // bit width of one coef    (full Kyber: 12)
-#define NTT_LOG2_N  2       // log2(NTT_N)              (full Kyber: 8)
+#define NTT_LOG2_N  2       // log2(NTT_N)              (full Kyber: 7)
 
 // C++ aliases for the above macros
 constexpr int N      = NTT_N;
