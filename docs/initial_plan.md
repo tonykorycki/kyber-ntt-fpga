@@ -50,19 +50,29 @@ Read c[0..n-1] ← BRAM C         <──
 The algorithm computes $c(x) = a(x) \cdot b(x) \bmod (x^n + 1, q)$ using the negacyclic NTT. Full derivation in `docs/mathematic_derivation.md`. Summary:
 
 **Pre-twist** (eq. 7):
-$$\tilde{a}_i = a_i \cdot \psi^i \bmod q$$
+```math
+\tilde{a}_i = a_i \cdot \psi^i \bmod q
+```
 
 **Forward NTT — Cooley-Tukey butterfly** (eq. CT), $\log_2 n$ stages:
-$$\hat{a}_k = E_k + \omega_m^j \cdot O_k, \qquad \hat{a}_{k+m/2} = E_k - \omega_m^j \cdot O_k$$
+```math
+\hat{a}_k = E_k + \omega_m^j \cdot O_k, \qquad \hat{a}_{k+m/2} = E_k - \omega_m^j \cdot O_k
+```
 
 **Pointwise multiply** (eq. 17):
-$$C_k = A_k \cdot B_k \bmod q$$
+```math
+C_k = A_k \cdot B_k \bmod q
+```
 
 **Inverse NTT — Gentleman-Sande butterfly** (eq. GS), $\log_2 n$ stages, scale by $n^{-1}$:
-$$a[k+j] = u + t, \qquad a[k+j+m/2] = \omega_m^{-j} \cdot (u - t)$$
+```math
+a[k+j] = u + t, \qquad a[k+j+m/2] = \omega_m^{-j} \cdot (u - t)
+```
 
 **Post-twist** (eq. 9):
-$$c_i = \tilde{c}_i \cdot \psi^{-i} \bmod q$$
+```math
+c_i = \tilde{c}_i \cdot \psi^{-i} \bmod q
+```
 
 The key hardware operation at every step is modular multiplication mod $q$, implemented via Barrett reduction (eq. 20). Twiddle factor tables ($\psi^i$, $\omega^i$, and their inverses) are precomputed by `scripts/gen_twiddle_rom.py` and stored in on-chip BRAM.
 
