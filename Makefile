@@ -2,11 +2,17 @@
 # Using cmd //c (MinGW-safe) and backslash paths to avoid Windows /flag parsing of forward slashes
 RUN_HLS = python scripts/run_hls_win.py $(1)
 
-.PHONY: golden twiddle hls-csim-barrett hls-csim-ntt-engine hls-csim-twist hls-csim-pointwise hls-csim hls-synth sim clean help
+# Override these on the command line to test alternate parameter sets:
+#   make golden NTT_N=128 NTT_Q=3329
+NTT_N ?= 4
+NTT_Q ?= 17
+
+.PHONY: golden vectors twiddle hls-csim-barrett hls-csim-ntt-engine hls-csim-twist hls-csim-pointwise hls-csim hls-synth sim clean help
 
 help:
 	@echo "Targets:"
 	@echo "  golden               -- run Python golden model tests (M1)"
+	@echo "  vectors              -- regenerate golden/test_vectors.txt for HLS/SV testbenches"
 	@echo "  twiddle              -- regenerate hls/src/twiddle_rom.h and vivado/*.coe (M3)"
 	@echo "  hls-csim-barrett     -- Vitis C-sim: barrett unit test (M2)"
 	@echo "  hls-csim-ntt-engine  -- Vitis C-sim: ntt_engine unit test (M4)"
@@ -17,8 +23,13 @@ help:
 	@echo "  sim                  -- SystemVerilog simulation via Icarus (M8)"
 	@echo "  clean                -- remove all generated artifacts"
 
+NTT_VECTORS ?= 16
+
 golden:
-	python golden/test_ntt.py
+	python golden/test_ntt.py --n $(NTT_N) --q $(NTT_Q)
+
+vectors:
+	python golden/gen_test_vectors.py --n $(NTT_N) --q $(NTT_Q) --vectors $(NTT_VECTORS)
 
 twiddle:
 	python scripts/gen_twiddle_rom.py --n 4 --q 17
