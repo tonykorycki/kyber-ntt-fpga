@@ -1,16 +1,18 @@
 '''
-golden/test_ntt.py — Test vectors and correctness verification.
-Generates test vectors for HLS C-sim and SV simulation.
+golden/test_ntt.py — Golden model correctness tests.
 Verifies NTT/INTT/negacyclic_mul against schoolbook multiplication.
+
+To generate test vectors for HLS C-sim / SV simulation:
+    python golden/gen_test_vectors.py --n N --q Q --vectors 16
 
 test_barrett         exhaustive for all (a,b) pairs in Z_q
 test_pre_post_twist  pre_twist then post_twist = identity
 test_ntt_forward     compare CT butterfly against naive O(n^2) definition
 test_ntt_roundtrip   ntt_forward then ntt_inverse = identity
 test_ntt_mul         compare ntt_mul vs schoolbook_nwc on random inputs
-generate_vectors     write test vectors to .txt for SV/HLS testbench
 '''
 
+import argparse
 import random
 from ntt import (
     DEV_CONFIG, NTTConfig,
@@ -103,41 +105,28 @@ def test_ntt_mul(config: NTTConfig, n_trials: int = 50):
     print(f"test_ntt_mul: PASS ({n_trials} random pairs)")
 
 
-'''
-Test vector generation for SV / HLS testbench
-Each line: space-separated coefficients.
-File format:
-  a        n coefficients
-  b        n coefficients
-  c = a*b  n coefficients  (negacyclic product)
-'''
-
-def generate_vectors(config: NTTConfig, n_vectors: int = 16, filename: str = "golden/test_vectors.txt"):
-    """Write n_vectors test cases to filename for use in SV/HLS simulation."""
-    with open(filename, "w") as f:
-        f.write(f"# NTT test vectors: d={config.d}, q={config.q}\n")
-        f.write(f"# Format per vector: a, b, c=ntt_mul(a,b) — one polynomial per line\n")
-        for i in range(n_vectors):
-            a = rand_poly(config)
-            b = rand_poly(config)
-            c = ntt_mul(a, b, config)
-            # sanity check before writing
-            assert c == schoolbook_nwc(a, b, config), "vector generation: ntt_mul != schoolbook"
-            f.write(f"# vector {i}\n")
-            f.write(" ".join(map(str, a)) + "\n")
-            f.write(" ".join(map(str, b)) + "\n")
-            f.write(" ".join(map(str, c)) + "\n")
-    print(f"generate_vectors: DONE ({n_vectors} vectors written to {filename})")
-
 if __name__ == "__main__":
-    random.seed(42)
-    cfg = DEV_CONFIG
+    parser = argparse.ArgumentParser(description='Run NTT golden model tests.')
+    parser.add_argument('--n', type=int, help='Polynomial degree (default: dev config n=4)')
+    parser.add_argument('--q', type=int, help='Modulus (default: dev config q=17)')
+    parser.add_argument('--seed', type=int, default=42, help='RNG seed (default: 42)')
+    args = parser.parse_args()
+
+    random.seed(args.seed)
+
+    if args.n is not None and args.q is not None:
+        cfg = NTTConfig.from_params(d=args.n, q=args.q)
+        print(f"Using params: n={args.n}, q={args.q}")
+    elif args.n is not None or args.q is not None:
+        parser.error("--n and --q must be specified together")
+    else:
+        cfg = DEV_CONFIG
+        print(f"Using dev config: n={cfg.d}, q={cfg.q}")
 
     test_barrett(cfg)
     test_pre_post_twist(cfg)
     test_ntt_forward(cfg)
     test_ntt_roundtrip(cfg)
     test_ntt_mul(cfg)
-    generate_vectors(cfg)
 
     print("\nAll tests passed.")
