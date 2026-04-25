@@ -264,6 +264,7 @@ a \star b = \mathrm{INTT}\!\left(\mathrm{NTT}(a) \odot \mathrm{NTT}(b)\right).
 ```math
 (\tilde{a} \star \tilde{b})_k = \psi^k \, (a \cdot b)_k
 ```
+(8)
 
 where $a \cdot b$ is the negacyclic product in $R$.
 
