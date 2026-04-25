@@ -32,7 +32,7 @@ vectors:
 	python golden/gen_test_vectors.py --n $(NTT_N) --q $(NTT_Q) --vectors $(NTT_VECTORS)
 
 twiddle:
-	python scripts/gen_twiddle_rom.py --n 4 --q 17
+	python scripts/gen_twiddle_rom.py --n $(NTT_N) --q $(NTT_Q)
 
 hls-csim-barrett:
 	$(call RUN_HLS,hls/run_hls.tcl barrett)
