@@ -25,8 +25,9 @@ computing $c = a \cdot b \in R$ with coefficients reduced mod $q$. Naïve school
 The $n$-point **Number Theoretic Transform** of a vector $\mathbf{a} = (a_0, \ldots, a_{n-1}) \in \mathbb{Z}_q^n$ is
 
 ```math
-\hat{a}_k = \sum_{j=0}^{n-1} a_j \, \omega^{jk} \bmod q, \qquad k = 0, \ldots, n-1 \tag{1}
+\hat{a}_k = \sum_{j=0}^{n-1} a_j \, \omega^{jk} \bmod q, \qquad k = 0, \ldots, n-1
 ```
+(1)
 
 where $\omega \in \mathbb{Z}_q$ is a **primitive $n$-th root of unity**. This is identical in structure to the DFT, with $\mathbb{C}$ replaced by $\mathbb{Z}_q$. Interpreting $\mathbf{a}$ as the coefficient vector of a polynomial $a(x) = \sum_j a_j x^j$, equation (1) says $\hat{a}_k = a(\omega^k)$: the NTT evaluates $a$ at the $n$ distinct points $\omega^0, \omega^1, \ldots, \omega^{n-1}$.
 
@@ -38,7 +39,7 @@ A primitive $n$-th root of unity $\omega$ exists in $\mathbb{Z}_q$ if and only i
 q \text{ is prime}, \qquad n \mid (q - 1).
 ```
 
-The second condition follows from Fermat's little theorem: the multiplicative group $\mathbb{Z}_q^{\ast}$ has order $q - 1$, so $n$-th roots of unity exist iff $n \mid (q-1)$. Given any primitive root $g$ of $\mathbb{Z}_q^{\ast}$:
+The second condition follows from Fermat's little theorem: the multiplicative group $\mathbb{Z}_q^*$ has order $q - 1$, so $n$-th roots of unity exist iff $n \mid (q-1)$. Given any primitive root $g$ of $\mathbb{Z}_q^*$:
 
 ```math
 \omega = g^{(q-1)/n} \bmod q.
@@ -53,12 +54,14 @@ The following properties are used throughout:
 ```
 
 ```math
-\omega^{n/2} \equiv -1 \pmod{q} \tag{3}
+\omega^{n/2} \equiv -1 \pmod{q}
 ```
+(3)
 
 ```math
-\sum_{j=0}^{n-1} \omega^{jk} \equiv \begin{cases} n & k \equiv 0 \pmod{n} \\ 0 & \text{otherwise} \end{cases} \pmod{q} \tag{4}
+\sum_{j=0}^{n-1} \omega^{jk} \equiv \begin{cases} n & k \equiv 0 \pmod{n} \\ 0 & \text{otherwise} \end{cases} \pmod{q}
 ```
+(4)
 
 *Proof of (3).* Since $(\omega^{n/2})^2 = \omega^n = 1$, $\omega^{n/2}$ is a square root of $1$ mod $q$. The only square roots of $1$ mod a prime are $\pm 1$. As $\omega^{n/2} \neq 1$ by primitivity, it must equal $-1$.
 
@@ -93,8 +96,9 @@ High-degree terms wrap positively ($x^n \to 1$). This is the wrong ring for Kybe
 In $\mathbb{Z}_q[x]/(x^n + 1)$, high-degree terms wrap with a sign flip ($x^n \to -1$):
 
 ```math
-(a \cdot b)_k = \sum_{i+j \equiv k \pmod{n}} a_i b_j - \sum_{i+j \equiv k+n \pmod{2n}} a_i b_j \bmod q. \tag{7}
+(a \cdot b)_k = \sum_{i+j \equiv k \pmod{n}} a_i b_j - \sum_{i+j \equiv k+n \pmod{2n}} a_i b_j \bmod q.
 ```
+(7)
 
 ### 3.3 The negacyclic twist
 
@@ -109,8 +113,9 @@ Define the twisted vectors:
 **Claim:** the cyclic convolution of $\tilde{\mathbf{a}}$ and $\tilde{\mathbf{b}}$ satisfies
 
 ```math
-(\tilde{a} \star \tilde{b})_k = \psi^k \, (a \cdot b)_k \tag{8}
+(\tilde{a} \star \tilde{b})_k = \psi^k \, (a \cdot b)_k
 ```
+(8)
 
 where $a \cdot b$ is the negacyclic product in $R$ and $\star$ denotes cyclic convolution.
 
@@ -135,8 +140,9 @@ Since $\psi^n = -1$, we have $\psi^{k+n} = -\psi^k$, so:
 Rearranging (8):
 
 ```math
-(a \cdot b)_k = \psi^{-k} \, (\tilde{a} \star \tilde{b})_k. \tag{9}
+(a \cdot b)_k = \psi^{-k} \, (\tilde{a} \star \tilde{b})_k.
 ```
+(9)
 
 ---
 
@@ -153,8 +159,9 @@ Split the NTT sum (1) into even-indexed and odd-indexed terms. Every index $j \i
 Factor $\omega^{(2r+1)k} = \omega^{2rk} \cdot \omega^k$:
 
 ```math
-\hat{a}_k = \sum_{r=0}^{n/2-1} a_{2r} \, (\omega^2)^{rk} + \omega^k \sum_{r=0}^{n/2-1} a_{2r+1} \, (\omega^2)^{rk}. \tag{10}
+\hat{a}_k = \sum_{r=0}^{n/2-1} a_{2r} \, (\omega^2)^{rk} + \omega^k \sum_{r=0}^{n/2-1} a_{2r+1} \, (\omega^2)^{rk}.
 ```
+(10)
 
 Since $(\omega^2)^{n/2} = \omega^n = 1$ and $\omega^2$ is primitive of order $n/2$ (as $(\omega^2)^m = 1 \Rightarrow n \mid 2m \Rightarrow n/2 \mid m$), each sum in (10) is an $n/2$-point NTT with root $\omega^2$. Writing
 
@@ -165,16 +172,18 @@ E_k = \mathrm{NTT}_{n/2}(\mathbf{a}^{\mathrm{even}})_k, \qquad O_k = \mathrm{NTT
 equation (10) becomes:
 
 ```math
-\hat{a}_k = E_k + \omega^k \, O_k, \qquad 0 \le k < n/2. \tag{11}
+\hat{a}_k = E_k + \omega^k \, O_k, \qquad 0 \le k < n/2.
 ```
+(11)
 
 ### 4.2 The Cooley-Tukey butterfly
 
 For the upper half $k' = k + n/2$, apply $\omega^{k+n/2} = -\omega^k$ (property (3)):
 
 ```math
-\hat{a}_{k+n/2} = E_k - \omega^k \, O_k. \tag{12}
+\hat{a}_{k+n/2} = E_k - \omega^k \, O_k.
 ```
+(12)
 
 Equations (11) and (12) together form the **Cooley-Tukey butterfly**:
 
@@ -227,8 +236,9 @@ After all stages, apply a bit-reversal permutation to the output and scale every
 **Theorem.** Let $q$ be prime with $n \mid (q-1)$, $n$ a power of two. Let $\omega$ be a primitive $n$-th root of unity in $\mathbb{Z}_q$ and $\psi$ a primitive $2n$-th root with $\psi^2 = \omega$. Then the negacyclic product $c = a \cdot b$ in $R = \mathbb{Z}_q[x]/(x^n+1)$ is given exactly by
 
 ```math
-c_k = \psi^{-k} \cdot \mathrm{INTT}\!\left(\mathrm{NTT}(\psi^\bullet \cdot a) \odot \mathrm{NTT}(\psi^\bullet \cdot b)\right)_k \tag{14}
+c_k = \psi^{-k} \cdot \mathrm{INTT}\!\left(\mathrm{NTT}(\psi^\bullet \cdot a) \odot \mathrm{NTT}(\psi^\bullet \cdot b)\right)_k
 ```
+(14)
 
 where $(\psi^\bullet \cdot a)_j = \psi^j a_j$ and $\odot$ denotes pointwise multiplication in $\mathbb{Z}_q^n$.
 
@@ -252,7 +262,7 @@ a \star b = \mathrm{INTT}\!\left(\mathrm{NTT}(a) \odot \mathrm{NTT}(b)\right).
 
 
 ```math
-(\tilde{a} \star \tilde{b})_k = \psi^k \, (a \cdot b)_k \tag{8}
+(\tilde{a} \star \tilde{b})_k = \psi^k \, (a \cdot b)_k
 ```
 
 where $a \cdot b$ is the negacyclic product in $R$.
@@ -278,24 +288,27 @@ This is exactly equation (14). $\blacksquare$
 **Input:** $a, b \in \mathbb{Z}_q^n$; precomputed tables $\psi^i$, $\psi^{-i}$, $\omega^i$, $\omega^{-i}$ for $i = 0, \ldots, n-1$.
 
 ```math
-\tilde{a}_i \leftarrow \psi^i \, a_i \bmod q \qquad \text{(pre-twist)} \tag{15}
+\tilde{a}_i \leftarrow \psi^i \, a_i \bmod q \qquad \text{(pre-twist)}
 ```
+(15)
 
 ```math
 \tilde{b}_i \leftarrow \psi^i \, b_i \bmod q
 ```
 
 ```math
-A \leftarrow \mathrm{NTT}(\tilde{\mathbf{a}}) \qquad \text{(forward NTT via CT butterflies)} \tag{16}
+A \leftarrow \mathrm{NTT}(\tilde{\mathbf{a}}) \qquad \text{(forward NTT via CT butterflies)}
 ```
+(16)
 
 ```math
 B \leftarrow \mathrm{NTT}(\tilde{\mathbf{b}})
 ```
 
 ```math
-C_k \leftarrow A_k \cdot B_k \bmod q, \quad k = 0, \ldots, n-1 \qquad \text{(pointwise multiply)} \tag{17}
+C_k \leftarrow A_k \cdot B_k \bmod q, \quad k = 0, \ldots, n-1 \qquad \text{(pointwise multiply)}
 ```
+(17)
 
 ```math
 \tilde{\mathbf{c}} \leftarrow \mathrm{INTT}(C) \qquad \text{(inverse NTT via GS butterflies)}
@@ -327,7 +340,7 @@ The pre-twist $\psi^\bullet$ converts the negacyclic ring into the cyclic ring b
 |---|---|
 | $n$ | $4$ |
 | $q$ | $17$ |
-| $g$ (primitive root of $\mathbb{Z}_{17}^{\ast}$) | $3$ |
+| $g$ (primitive root of $\mathbb{Z}_{17}^*$) | $3$ |
 | $\psi = g^{(q-1)/2n}$ | $3^2 = 9$ |
 | $\omega = \psi^2$ | $81 \bmod 17 = 13$ |
 | $n^{-1} \bmod q$ | $4^{-1} \bmod 17 = 13$ |
@@ -368,7 +381,8 @@ r = ab - q_{\mathrm{approx}} \cdot q
 ```
 
 ```math
-r \leftarrow r - q \cdot [r \ge q]. \tag{20}
+r \leftarrow r - q \cdot [r \ge q].
 ```
+(20)
 
 The correction step in (20) fires at most once, since the approximation error satisfies $|q_{\mathrm{approx}} - \lfloor ab/q \rfloor| \le 1$, which follows from $ab < q^2 \le 4^k$.
