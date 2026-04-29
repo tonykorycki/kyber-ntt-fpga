@@ -62,4 +62,4 @@ sim:
 clean:
 	rm -rf build/
 	rm -f sim/*.vvp sim/*.vcd sim/*.fst sim/*.log
-	rm -f hls/src/twiddle_rom.h vivado/twiddle_omega.coe vivado/twiddle_psi.coe
+	rm -f hls/src/twiddle_rom.h vivado/twiddle.coe vivado/slot_zeta.coe
