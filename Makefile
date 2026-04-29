@@ -7,11 +7,12 @@ RUN_HLS = python scripts/run_hls_win.py $(1)
 NTT_N ?= 4
 NTT_Q ?= 17
 
-.PHONY: golden vectors twiddle hls-csim-barrett hls-csim-ntt-engine hls-csim-twist hls-csim-pointwise hls-csim hls-synth sim clean help
+.PHONY: golden golden-kyber vectors twiddle hls-csim-barrett hls-csim-ntt-engine hls-csim-twist hls-csim-pointwise hls-csim hls-synth sim clean help
 
 help:
 	@echo "Targets:"
-	@echo "  golden               -- run Python golden model tests (M1)"
+	@echo "  golden               -- run Python golden model tests with dev params n=$(NTT_N) q=$(NTT_Q)"
+	@echo "  golden-kyber         -- run Python golden model tests with full Kyber params n=256 q=3329"
 	@echo "  vectors              -- regenerate golden/test_vectors.txt for HLS/SV testbenches"
 	@echo "  twiddle              -- regenerate hls/src/twiddle_rom.h and vivado/*.coe (M3)"
 	@echo "  hls-csim-barrett     -- Vitis C-sim: barrett unit test (M2)"
@@ -26,7 +27,10 @@ help:
 NTT_VECTORS ?= 16
 
 golden:
-	python golden/test_ntt.py --n $(NTT_N) --q $(NTT_Q)
+	python golden/kyber_ntt.py --n $(NTT_N) --q $(NTT_Q)
+
+golden-kyber:
+	python golden/kyber_ntt.py --n 256 --q 3329
 
 vectors:
 	python golden/gen_test_vectors.py --n $(NTT_N) --q $(NTT_Q) --vectors $(NTT_VECTORS)
