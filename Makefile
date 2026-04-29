@@ -7,7 +7,7 @@ RUN_HLS = python scripts/run_hls_win.py $(1)
 NTT_N ?= 4
 NTT_Q ?= 17
 
-.PHONY: golden golden-kyber vectors twiddle hls-csim-barrett hls-csim-ntt-engine hls-csim-twist hls-csim-mul-ntt hls-csim hls-synth sim clean help
+.PHONY: golden golden-kyber vectors twiddle hls-csim-barrett hls-csim-ntt-engine hls-csim-mul-ntt hls-csim hls-synth sim clean help
 
 help:
 	@echo "Targets:"
@@ -17,8 +17,7 @@ help:
 	@echo "  twiddle              -- regenerate hls/src/twiddle_rom.h and vivado/*.coe (M3)"
 	@echo "  hls-csim-barrett     -- Vitis C-sim: barrett unit test (M2)"
 	@echo "  hls-csim-ntt-engine  -- Vitis C-sim: ntt_engine unit test (M4)"
-	@echo "  hls-csim-twist       -- Vitis C-sim: twist unit test (M5)"
-	@echo "  hls-csim-mul-ntt     -- Vitis C-sim: ntt multiplication unit test (M5)"
+	@echo "  hls-csim-mul-ntt     -- Vitis C-sim: base-case slot multiply unit test (M5)"
 	@echo "  hls-csim             -- Vitis C-sim: full pipeline tb_ntt_top (M6)"
 	@echo "  hls-synth            -- HLS synthesis + IP export to vivado/ip_repo (M6)"
 	@echo "  sim                  -- SystemVerilog simulation via Icarus (M8)"
@@ -43,9 +42,6 @@ hls-csim-barrett:
 
 hls-csim-ntt-engine:
 	$(call RUN_HLS,hls/run_hls.tcl ntt_engine)
-
-hls-csim-twist:
-	$(call RUN_HLS,hls/run_hls.tcl twist)
 
 hls-csim-mul-ntt:
 	$(call RUN_HLS,hls/run_hls.tcl mul_ntt)

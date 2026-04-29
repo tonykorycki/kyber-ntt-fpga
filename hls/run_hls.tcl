@@ -53,7 +53,6 @@ switch $mode {
         set top_func    ntt_top
         set sources     [list $root/hls/src/barrett.cpp \
                               $root/hls/src/ntt_engine.cpp \
-                              $root/hls/src/twist.cpp \
                               $root/hls/src/mul_ntt.cpp \
                               $root/hls/src/ntt_top.cpp]
         set tb          $root/hls/tb/tb_ntt_top.cpp
