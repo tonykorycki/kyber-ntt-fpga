@@ -7,7 +7,7 @@
 #   make hls-csim-barrett      # barrett unit test
 #   make hls-csim-ntt-engine   # ntt_engine unit test
 #   make hls-csim-twist        # twist unit test
-#   make hls-csim-pointwise    # pointwise unit test
+#   make hls-csim-mul-ntt      # mul-ntt unit test
 #   make hls-csim              # full project csim
 #   make hls-synth             # full project csim + synthesis
 
@@ -39,12 +39,12 @@ switch $mode {
         set tb          $root/hls/tb/tb_twist.cpp
         set do_synth    0
     }
-    pointwise {
-        set proj_name   pointwise_unit
-        set top_func    pointwise_mul
+    mul_ntt {
+        set proj_name   mul_ntt_unit
+        set top_func    mul_ntt
         set sources     [list $root/hls/src/barrett.cpp \
-                              $root/hls/src/pointwise.cpp]
-        set tb          $root/hls/tb/tb_pointwise.cpp
+                              $root/hls/src/mul_ntt.cpp]
+        set tb          $root/hls/tb/tb_mul_ntt.cpp
         set do_synth    0
     }
     default {
@@ -54,7 +54,7 @@ switch $mode {
         set sources     [list $root/hls/src/barrett.cpp \
                               $root/hls/src/ntt_engine.cpp \
                               $root/hls/src/twist.cpp \
-                              $root/hls/src/pointwise.cpp \
+                              $root/hls/src/mul_ntt.cpp \
                               $root/hls/src/ntt_top.cpp]
         set tb          $root/hls/tb/tb_ntt_top.cpp
         set do_synth    [expr {$mode eq "synth"}]
