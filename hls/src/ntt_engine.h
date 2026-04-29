@@ -13,10 +13,10 @@
 #include <ap_int.h>
 
 // Retarget by running gen_twiddle_rom.py — do not edit these manually
-#define NTT_N       4       // polynomial degree        (full Kyber: 256)
-#define NTT_Q       17      // coefficient modulus      (full Kyber: 3329)
-#define NTT_COEF_W  5       // bit width of one coef    (full Kyber: 12)
-#define NTT_LOG2_N  2       // log2(NTT_N)              (full Kyber: 8)
+#define NTT_N       256       // polynomial degree        (full Kyber: 256)
+#define NTT_Q       3329      // coefficient modulus      (full Kyber: 3329)
+#define NTT_COEF_W  12       // bit width of one coef    (full Kyber: 12)
+#define NTT_LOG2_N  8       // log2(NTT_N)              (full Kyber: 8)
 
 // C++ aliases
 constexpr int N      = NTT_N;
