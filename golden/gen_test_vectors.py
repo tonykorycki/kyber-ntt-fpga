@@ -10,7 +10,7 @@ Format per vector (3 lines):
 
 Usage:
     python golden/gen_test_vectors.py --n 4   --q 17    --vectors 16
-    python golden/gen_test_vectors.py --n 128 --q 3329  --vectors 64
+    python golden/gen_test_vectors.py --n 256 --q 3329  --vectors 64
 """
 
 import argparse
@@ -19,29 +19,30 @@ import random
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
-from ntt import NTTConfig, ntt_mul, schoolbook_nwc
+from kyber_ntt import KyberNTTConfig, poly_mul, schoolbook_mul
 
 
-def generate_vectors(cfg: NTTConfig, n_vectors: int, out_path: str) -> None:
+def generate_vectors(cfg: KyberNTTConfig, n_vectors: int, out_path: str) -> None:
     with open(out_path, 'w') as f:
-        f.write(f'# NTT test vectors: n={cfg.d}, q={cfg.q}\n')
-        f.write(f'# Format per vector: a, b, c=ntt_mul(a,b) — one polynomial per line\n')
+        f.write(f'# Kyber NTT test vectors: n={cfg.n}, q={cfg.q}, zeta={cfg.zeta}\n')
+        f.write(f'# Format per vector: a, b, c=poly_mul(a,b) — one polynomial per line\n')
         for i in range(n_vectors):
-            a = [random.randint(0, cfg.q - 1) for _ in range(cfg.d)]
-            b = [random.randint(0, cfg.q - 1) for _ in range(cfg.d)]
-            c = ntt_mul(a, b, cfg)
-            assert c == schoolbook_nwc(a, b, cfg), f'vector {i}: ntt_mul != schoolbook_nwc'
+            a = [random.randint(0, cfg.q - 1) for _ in range(cfg.n)]
+            b = [random.randint(0, cfg.q - 1) for _ in range(cfg.n)]
+            c = poly_mul(a, b, cfg)
+            assert c == schoolbook_mul(a, b, cfg), f'vector {i}: poly_mul != schoolbook_mul'
             f.write(f'# vector {i}\n')
             f.write(' '.join(map(str, a)) + '\n')
             f.write(' '.join(map(str, b)) + '\n')
             f.write(' '.join(map(str, c)) + '\n')
-    print(f'Wrote {n_vectors} vectors to {out_path}  (n={cfg.d}, q={cfg.q})')
+    print(f'Wrote {n_vectors} vectors to {out_path}  (n={cfg.n}, q={cfg.q}, zeta={cfg.zeta})')
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Generate NTT test vectors.')
+    parser = argparse.ArgumentParser(description='Generate Kyber NTT test vectors.')
     parser.add_argument('--n',       type=int, default=4,    help='Polynomial degree (default: 4)')
     parser.add_argument('--q',       type=int, default=17,   help='Modulus (default: 17)')
+    parser.add_argument('--zeta',    type=int, default=None, help='Primitive N-th root (auto if omitted)')
     parser.add_argument('--vectors', type=int, default=16,   help='Number of vectors (default: 16)')
     parser.add_argument('--seed',    type=int, default=42,   help='RNG seed (default: 42)')
     parser.add_argument('--out',     type=str,
@@ -50,5 +51,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     random.seed(args.seed)
-    cfg = NTTConfig.from_params(d=args.n, q=args.q)
+    cfg = KyberNTTConfig.from_params(n=args.n, q=args.q, zeta=args.zeta)
     generate_vectors(cfg, args.vectors, args.out)
