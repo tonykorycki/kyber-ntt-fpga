@@ -34,6 +34,12 @@ constexpr int BARRETT_K = COEF_W;
 typedef ap_uint<2 * COEF_W + 1> barrett_const_t;
 static const barrett_const_t BARRETT_M = (barrett_const_t(1) << (2 * BARRETT_K)) / Q;
 
+// Optional: define NTT_FLAT_PIPELINE to fuse the start/j loops into one N/2-iteration
+// pipeline per stage. Eliminates pipeline drain/restart between blocks (~128 gaps at N=256).
+// Costs a div+mul per butterfly to compute element indices from the flat loop counter.
+// Leave undefined for the baseline nested-loop structure (easier to read and verify).
+// #define NTT_FLAT_PIPELINE
+
 // Forward NTT  (Cooley-Tukey):   ntt_engine(a, false)
 // Inverse NTT  (Gentleman-Sande): ntt_engine(a, true)
 // Twiddle tables (TWIDDLE, SLOT_ZETA, INV_N) are in twiddle_rom.h — included by ntt_engine.cpp.

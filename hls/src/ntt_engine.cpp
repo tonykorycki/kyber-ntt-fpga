@@ -5,7 +5,10 @@
 //
 // Twiddle schedule: TWIDDLE[k] = zeta^{brv(k+1)} from twiddle_rom.h.
 // INTT uses the same table traversed in reverse — positive twiddles, no negation (FIPS 203 §4).
-// PIPELINE II=1 on the inner j-loop only.
+//
+// Two pipeline strategies (selected by NTT_FLAT_PIPELINE in ntt_engine.h):
+//   Default:           PIPELINE II=1 on inner j-loop; pipeline drains between blocks.
+//   NTT_FLAT_PIPELINE: start+j fused into one N/2-iteration loop per stage; no drain gaps.
 
 #include "ntt_engine.h"
 #include "barrett.h"
@@ -29,7 +32,32 @@ void ntt_engine(coef_t a[N], bool inverse) {
 #pragma HLS ARRAY_PARTITION variable=a cyclic factor=2 dim=1
 
     if (!inverse) {
-        // Cooley-Tukey forward NTT (FIPS 203 Algorithm 9)
+
+#ifdef NTT_FLAT_PIPELINE
+        // Flat forward NTT: one continuous pipeline of N/2 butterflies per stage.
+        // log2_len tracks log2(len) so all index arithmetic is shifts and masks.
+        //   blk   = i >> log2_len          (i / len)
+        //   j     = i & (len - 1)          (i % len)
+        //   lower = (blk << (log2_len+1)) | j   (blk*2*len + j; | safe since j < len)
+        int k = 0;
+        for (int len = N/2, log2_len = LOG2_N - 1; len >= 2; len >>= 1, log2_len--) {
+            int k_base   = k;
+            int n_blocks = N >> (log2_len + 1);   // N / (2*len)
+            for (int i = 0; i < N/2; i++) {
+#pragma HLS PIPELINE II=1
+                int blk   = i >> log2_len;
+                int j     = i & (len - 1);
+                int lower = (blk << (log2_len + 1)) | j;
+                int upper = lower + len;
+                coef_t zeta    = TWIDDLE[k_base + blk];
+                coef_t t       = barrett_mul(zeta, a[upper]);
+                a[upper]       = mod_sub(a[lower], t);
+                a[lower]       = mod_add(a[lower], t);
+            }
+            k += n_blocks;
+        }
+#else
+        // Standard nested-loop forward NTT (FIPS 203 Algorithm 9).
         int k = 0;
         for (int len = N/2; len >= 2; len >>= 1) {
             for (int start = 0; start < N; start += 2*len) {
@@ -42,10 +70,31 @@ void ntt_engine(coef_t a[N], bool inverse) {
                 }
             }
         }
+#endif
 
     } else {
-        // Gentleman-Sande inverse NTT (FIPS 203 Algorithm 10)
-        // Positive twiddle — TWIDDLE traversed in reverse, no negation.
+
+#ifdef NTT_FLAT_PIPELINE
+        // Flat inverse NTT: same fusion, twiddle index counts down from k_start.
+        int k = N/2 - 2;
+        for (int len = 2, log2_len = 1; len <= N/2; len <<= 1, log2_len++) {
+            int k_start  = k;
+            int n_blocks = N >> (log2_len + 1);   // N / (2*len)
+            for (int i = 0; i < N/2; i++) {
+#pragma HLS PIPELINE II=1
+                int blk   = i >> log2_len;
+                int j     = i & (len - 1);
+                int lower = (blk << (log2_len + 1)) | j;
+                int upper = lower + len;
+                coef_t zeta    = TWIDDLE[k_start - blk];
+                coef_t t       = a[lower];
+                a[lower]       = mod_add(t, a[upper]);
+                a[upper]       = barrett_mul(zeta, mod_sub(a[upper], t));
+            }
+            k -= n_blocks;
+        }
+#else
+        // Standard nested-loop inverse NTT (FIPS 203 Algorithm 10).
         int k = N/2 - 2;
         for (int len = 2; len <= N/2; len <<= 1) {
             for (int start = 0; start < N; start += 2*len) {
@@ -58,8 +107,9 @@ void ntt_engine(coef_t a[N], bool inverse) {
                 }
             }
         }
+#endif
 
-        // Scale by (N/2)^{-1} mod Q
+        // Scale by (N/2)^{-1} mod Q — same for both pipeline strategies
         for (int i = 0; i < N; i++) {
 #pragma HLS PIPELINE II=1
             a[i] = barrett_mul(a[i], INV_N);
