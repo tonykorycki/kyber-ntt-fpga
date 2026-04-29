@@ -1,30 +1,77 @@
-// hls/tb/tb_ntt_top.cpp — HLS C-sim testbench for full NTT pipeline
+// hls/tb/tb_ntt_top.cpp — End-to-end C-sim testbench for ntt_top
 //
-// Tests:
-//   ntt_top(a, b, c) == expected_c for all 16 test vectors
+// Reads golden/test_vectors.txt produced by golden/gen_test_vectors.py.
+// Each vector: three lines of N space-separated coefficients (a, b, c=poly_mul(a,b)).
+// Calls ntt_top(a, b, c_out) and compares c_out against the golden c.
 //
-// Reads all 16 (a, b, c) triples from golden/test_vectors.txt.
-// Exits with nonzero if any vector fails (Vitis HLS C-sim convention).
+// Path to test_vectors.txt is derived from __FILE__ so it works regardless
+// of the Vitis HLS C-sim working directory.
 
 #include "../src/ntt_top.h"
 #include <cstdio>
-#include <cstdlib>
+#include <cstring>
+#include <string>
+
+static std::string vector_path() {
+    std::string f = __FILE__;
+    // This file: hls/tb/tb_ntt_top.cpp — repo root is two levels up
+    size_t pos = f.rfind("hls");
+    return f.substr(0, pos) + "golden/test_vectors.txt";
+}
+
+static bool read_poly(FILE *fp, int poly[N]) {
+    char line[8192];
+    while (true) {
+        if (!fgets(line, sizeof(line), fp)) return false;
+        if (line[0] != '#' && line[0] != '\n' && line[0] != '\r') break;
+    }
+    char *p = line;
+    for (int i = 0; i < N; i++) {
+        while (*p == ' ' || *p == '\t') p++;
+        if (!*p || *p == '\n' || *p == '\r') return false;
+        poly[i] = (int)strtol(p, &p, 10);
+    }
+    return true;
+}
 
 int main() {
-    int failures = 0;
+    std::string path = vector_path();
+    FILE *fp = fopen(path.c_str(), "r");
+    if (!fp) {
+        printf("FAIL: cannot open %s\n", path.c_str());
+        return 1;
+    }
 
-    // TODO: open ../../golden/test_vectors.txt
-    // TODO: for each of 16 vectors:
-    //   coef_t a[N], b[N], c_expected[N], c_got[N];
-    //   read a, b, c_expected from file
-    //   copy a -> a_copy, b -> b_copy  (ntt_top modifies inputs in place)
-    //   ntt_top(a_copy, b_copy, c_got)
-    //   if (c_got != c_expected) { printf("FAIL vector %d\n", i); failures++; }
+    int failures = 0, vectors = 0;
+    int ref_a[N], ref_b[N], ref_c[N];
+
+    while (read_poly(fp, ref_a) && read_poly(fp, ref_b) && read_poly(fp, ref_c)) {
+        coef_t a[N], b[N], c[N];
+        for (int i = 0; i < N; i++) { a[i] = ref_a[i]; b[i] = ref_b[i]; }
+
+        ntt_top(a, b, c);
+
+        for (int i = 0; i < N; i++) {
+            if ((int)c[i] != ref_c[i]) {
+                printf("FAIL vec=%d i=%d: got %d expected %d\n",
+                       vectors, i, (int)c[i], ref_c[i]);
+                failures++;
+            }
+        }
+        vectors++;
+    }
+
+    fclose(fp);
+
+    if (vectors == 0) {
+        printf("FAIL: no vectors read from %s\n", path.c_str());
+        return 1;
+    }
 
     if (failures == 0)
-        printf("tb_ntt_top: PASS (16/16 vectors)\n");
+        printf("tb_ntt_top: PASS (%d vectors)\n", vectors);
     else
-        printf("tb_ntt_top: FAIL (%d/16 vectors failed)\n", failures);
+        printf("tb_ntt_top: FAIL (%d failures across %d vectors)\n", failures, vectors);
 
     return failures ? 1 : 0;
 }
