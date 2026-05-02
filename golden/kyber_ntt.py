@@ -100,7 +100,28 @@ def _find_zeta(n: int, q: int) -> int:
     return zeta
 
 
+def _is_prime(q: int) -> bool:
+    try:
+        from sympy import isprime
+        return isprime(q)
+    except ImportError:
+        if q < 2:
+            return False
+        if q < 4:
+            return True
+        if q % 2 == 0 or q % 3 == 0:
+            return False
+        i = 5
+        while i * i <= q:
+            if q % i == 0 or q % (i + 2) == 0:
+                return False
+            i += 6
+        return True
+
+
 def _validate(n: int, q: int, zeta: int) -> None:
+    if not _is_prime(q):
+        raise ValueError(f"Q={q} is not prime")
     if n < 4 or (n & (n - 1)) != 0:
         raise ValueError(f"N must be a power of 2 >= 4, got {n}")
     if (q - 1) % n != 0:
