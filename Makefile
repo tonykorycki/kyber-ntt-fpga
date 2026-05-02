@@ -56,10 +56,10 @@ all:
 	$(MAKE) hls-synth
 
 golden:
-	python golden/kyber_ntt.py --n $(NTT_N) --q $(NTT_Q)
+	python golden/test_kyber_ntt.py --n $(NTT_N) --q $(NTT_Q)
 
 golden-kyber:
-	python golden/kyber_ntt.py --n 256 --q 3329
+	python golden/test_kyber_ntt.py --n 256 --q 3329
 
 vectors:
 	python golden/gen_test_vectors.py --n $(NTT_N) --q $(NTT_Q) --vectors $(NTT_VECTORS)
