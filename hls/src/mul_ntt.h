@@ -1,4 +1,4 @@
-// hls/mul_ntt.h — Base-case quadratic slot multiply declarations
+// hls/src/mul_ntt.h — Base-case quadratic slot multiply declarations
 #ifndef MUL_NTT_H
 #define MUL_NTT_H
 

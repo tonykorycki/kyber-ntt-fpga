@@ -1,6 +1,6 @@
 // hls/src/ntt_engine.h — Parameters, types, and declarations for the NTT engine
 //
-// Architecture: docs/kyber_ntt_redesign.md — Kyber-native NTT (FIPS 203 Alg 9/10/11)
+// Architecture: docs/detailed_plan.md §1.2 — Kyber-native NTT (FIPS 203 Alg 9/10/11)
 //
 // To retarget (dev → full Kyber or any valid (N,Q) pair):
 //   python scripts/gen_twiddle_rom.py --n N --q Q

@@ -1,7 +1,7 @@
 // hls/src/mul_ntt.cpp — Base-case quadratic slot multiply
 //
 // Each NTT output pair (A[2i], A[2i+1]) lives in Z_q[x]/(x^2 - gamma_i)
-// where gamma_i = SLOT_ZETA[i] = zeta^{2*brv7(i)+1}.
+// where gamma_i = SLOT_ZETA[i] = zeta^{2*brvK(i)+1}, K = log2(N/2).
 // Product formula (5 mults per slot):
 //   C[2i]   = a0*b0 + a1*b1*gamma
 //   C[2i+1] = a0*b1 + a1*b0
