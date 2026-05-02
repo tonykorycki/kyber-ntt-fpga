@@ -6,7 +6,6 @@
 # Usage (from repo root via make):
 #   make hls-csim-barrett      # barrett unit test
 #   make hls-csim-ntt-engine   # ntt_engine unit test
-#   make hls-csim-twist        # twist unit test
 #   make hls-csim-mul-ntt      # mul-ntt unit test
 #   make hls-csim              # full project csim
 #   make hls-synth             # full project csim + synthesis
@@ -29,14 +28,6 @@ switch $mode {
         set sources     [list $root/hls/src/barrett.cpp \
                               $root/hls/src/ntt_engine.cpp]
         set tb          $root/hls/tb/tb_ntt_engine.cpp
-        set do_synth    0
-    }
-    twist {
-        set proj_name   twist_unit
-        set top_func    twist
-        set sources     [list $root/hls/src/barrett.cpp \
-                              $root/hls/src/twist.cpp]
-        set tb          $root/hls/tb/tb_twist.cpp
         set do_synth    0
     }
     mul_ntt {
