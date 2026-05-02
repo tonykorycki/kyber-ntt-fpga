@@ -55,8 +55,8 @@ class KyberNTTConfig:
         _validate(n, q, zeta)
         half_n    = n // 2
         bits      = n.bit_length() - 2   # log2(n/2)
-        barrett_k = (q * q).bit_length()
-        barrett_m = (1 << (2 * barrett_k)) // q
+        barrett_k = q.bit_length()          # matches HLS: BARRETT_K = COEF_W
+        barrett_m = (1 << (2 * barrett_k)) // q  # matches HLS: BARRETT_M = (1<<2K)/Q
         return cls(
             n=n, q=q, zeta=zeta,
             half_n=half_n,
@@ -124,9 +124,7 @@ def barrett_reduce(a: int, b: int, config: KyberNTTConfig) -> int:
     ab       = a * b
     q_approx = (ab * config.barrett_m) >> (2 * config.barrett_k)
     reduced  = ab - q_approx * config.q
-    if reduced < 0:
-        reduced += config.q
-    elif reduced >= config.q:
+    if reduced >= config.q:
         reduced -= config.q
     return reduced
 
