@@ -9,7 +9,7 @@
 #include "barrett.h"
 
 coef_t barrett_mul(coef_t a, coef_t b) {
-#pragma HLS INLINE
+#pragma HLS PIPELINE II=1
     prod_t ab = (prod_t)a * (prod_t)b;
     prod_t q_approx = (prod_t)((ab * (prod_t)BARRETT_M) >> (2 * BARRETT_K));
     prod_t r = ab - q_approx * Q;

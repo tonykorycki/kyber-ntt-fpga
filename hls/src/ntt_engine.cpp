@@ -6,9 +6,12 @@
 // Twiddle schedule: TWIDDLE[k] = zeta^{brv(k+1)} from twiddle_rom.h.
 // INTT uses the same table traversed in reverse — positive twiddles, no negation (FIPS 203 §4).
 //
-// Two pipeline strategies (selected by NTT_FLAT_PIPELINE in ntt_engine.h):
-//   Default:           PIPELINE II=1 on inner j-loop; pipeline drains between blocks.
-//   NTT_FLAT_PIPELINE: start+j fused into one N/2-iteration loop per stage; no drain gaps.
+// Pipeline strategies (flags defined in ntt_engine.h or via -D):
+//   Default:              PIPELINE II=1 on inner j-loop; pipeline drains between blocks.
+//   NTT_FLAT_PIPELINE:    start+j fused into one N/2-iteration loop per stage; no drain gaps.
+//   NTT_PREFETCH_READ:    (requires NTT_FLAT_PIPELINE) pre-fetches a[lower] into a register so
+//                         each cycle issues a[upper] (bank X) and a[lower_next] (bank Y != X)
+//                         concurrently — targets II=1 by eliminating the same-bank read conflict.
 
 #include "ntt_engine.h"
 #include "barrett.h"
@@ -34,25 +37,40 @@ void ntt_engine(coef_t a[N], bool inverse) {
     if (!inverse) {
 
 #ifdef NTT_FLAT_PIPELINE
-        // Flat forward NTT: one continuous pipeline of N/2 butterflies per stage.
-        // log2_len tracks log2(len) so all index arithmetic is shifts and masks.
-        //   blk   = i >> log2_len          (i / len)
-        //   j     = i & (len - 1)          (i % len)
-        //   lower = (blk << (log2_len+1)) | j   (blk*2*len + j; | safe since j < len)
+        // Flat forward NTT: counter-based addressing, no barrel shifters.
         int k = 0;
-        for (int len = N/2, log2_len = LOG2_N - 1; len >= 2; len >>= 1, log2_len--) {
+        for (int len = N/2; len >= 2; len >>= 1) {
             int k_base   = k;
-            int n_blocks = N >> (log2_len + 1);   // N / (2*len)
+            int n_blocks = N / (2*len);
+            int lower    = 0;
+            int blk      = 0;
+            int j_cnt    = 0;
+#ifdef NTT_PREFETCH_READ
+            coef_t a_lo_pre = a[0]; // prime: pre-read a[lower_0] before the pipeline starts
+#endif
             for (int i = 0; i < N/2; i++) {
 #pragma HLS PIPELINE II=1
-                int blk   = i >> log2_len;
-                int j     = i & (len - 1);
-                int lower = (blk << (log2_len + 1)) | j;
-                int upper = lower + len;
+#pragma HLS DEPENDENCE variable=a inter false
+                int upper      = lower + len;
                 coef_t zeta    = TWIDDLE[k_base + blk];
-                coef_t t       = barrett_mul(zeta, a[upper]);
-                a[upper]       = mod_sub(a[lower], t);
-                a[lower]       = mod_add(a[lower], t);
+                bool end_blk   = (j_cnt == len - 1);
+                int lower_next = end_blk ? lower + len + 1 : lower + 1;
+#ifdef NTT_PREFETCH_READ
+                // Consume pre-fetched lower; issue upper read (bank X) and lower_next
+                // read (bank Y != X, since lower_next = lower+1 has opposite parity) together.
+                coef_t a_lo    = a_lo_pre;
+                coef_t a_hi    = a[upper];
+                int lower_safe = (i < N/2 - 1) ? lower_next : 0; // guard last-iter OOB
+                a_lo_pre       = a[lower_safe];
+#else
+                coef_t a_lo    = a[lower];
+                coef_t a_hi    = a[upper];
+#endif
+                coef_t t       = barrett_mul(zeta, a_hi);
+                a[upper]       = mod_sub(a_lo, t);
+                a[lower]       = mod_add(a_lo, t);
+                if (end_blk) { j_cnt = 0; blk++; } else { j_cnt++; }
+                lower = lower_next;
             }
             k += n_blocks;
         }
@@ -64,9 +82,11 @@ void ntt_engine(coef_t a[N], bool inverse) {
                 coef_t zeta = TWIDDLE[k++];
                 for (int j = 0; j < len; j++) {
 #pragma HLS PIPELINE II=1
-                    coef_t t       = barrett_mul(zeta, a[start + j + len]);
-                    a[start+j+len] = mod_sub(a[start+j], t);
-                    a[start+j]     = mod_add(a[start+j], t);
+#pragma HLS DEPENDENCE variable=a inter false
+                    coef_t a_lo    = a[start+j];
+                    coef_t t       = barrett_mul(zeta, a[start+j+len]);
+                    a[start+j+len] = mod_sub(a_lo, t);
+                    a[start+j]     = mod_add(a_lo, t);
                 }
             }
         }
@@ -75,21 +95,37 @@ void ntt_engine(coef_t a[N], bool inverse) {
     } else {
 
 #ifdef NTT_FLAT_PIPELINE
-        // Flat inverse NTT: same fusion, twiddle index counts down from k_start.
+        // Flat inverse NTT: counter-based addressing, same structure as forward.
         int k = N/2 - 2;
-        for (int len = 2, log2_len = 1; len <= N/2; len <<= 1, log2_len++) {
+        for (int len = 2; len <= N/2; len <<= 1) {
             int k_start  = k;
-            int n_blocks = N >> (log2_len + 1);   // N / (2*len)
+            int n_blocks = N / (2*len);
+            int lower    = 0;
+            int blk      = 0;
+            int j_cnt    = 0;
+#ifdef NTT_PREFETCH_READ
+            coef_t a_lo_pre = a[0];
+#endif
             for (int i = 0; i < N/2; i++) {
 #pragma HLS PIPELINE II=1
-                int blk   = i >> log2_len;
-                int j     = i & (len - 1);
-                int lower = (blk << (log2_len + 1)) | j;
-                int upper = lower + len;
+#pragma HLS DEPENDENCE variable=a inter false
+                int upper      = lower + len;
                 coef_t zeta    = TWIDDLE[k_start - blk];
-                coef_t t       = a[lower];
-                a[lower]       = mod_add(t, a[upper]);
-                a[upper]       = barrett_mul(zeta, mod_sub(a[upper], t));
+                bool end_blk   = (j_cnt == len - 1);
+                int lower_next = end_blk ? lower + len + 1 : lower + 1;
+#ifdef NTT_PREFETCH_READ
+                coef_t a_lo    = a_lo_pre;
+                coef_t a_hi    = a[upper];
+                int lower_safe = (i < N/2 - 1) ? lower_next : 0;
+                a_lo_pre       = a[lower_safe];
+#else
+                coef_t a_lo    = a[lower];
+                coef_t a_hi    = a[upper];
+#endif
+                a[lower]       = mod_add(a_lo, a_hi);
+                a[upper]       = barrett_mul(zeta, mod_sub(a_hi, a_lo));
+                if (end_blk) { j_cnt = 0; blk++; } else { j_cnt++; }
+                lower = lower_next;
             }
             k -= n_blocks;
         }
@@ -101,9 +137,11 @@ void ntt_engine(coef_t a[N], bool inverse) {
                 coef_t zeta = TWIDDLE[k--];
                 for (int j = 0; j < len; j++) {
 #pragma HLS PIPELINE II=1
-                    coef_t t       = a[start+j];
-                    a[start+j]     = mod_add(t, a[start+j+len]);
-                    a[start+j+len] = barrett_mul(zeta, mod_sub(a[start+j+len], t));
+#pragma HLS DEPENDENCE variable=a inter false
+                    coef_t a_lo    = a[start+j];
+                    coef_t a_hi    = a[start+j+len];
+                    a[start+j]     = mod_add(a_lo, a_hi);
+                    a[start+j+len] = barrett_mul(zeta, mod_sub(a_hi, a_lo));
                 }
             }
         }
