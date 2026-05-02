@@ -14,9 +14,11 @@
 
 static std::string vector_path() {
     std::string f = __FILE__;
-    // This file: hls/tb/tb_ntt_top.cpp — repo root is two levels up
-    size_t pos = f.rfind("hls");
-    return f.substr(0, pos) + "golden/test_vectors.txt";
+    // Strip filename to get the directory (hls/tb/)
+    size_t sep = f.find_last_of("/\\");
+    std::string dir = (sep != std::string::npos) ? f.substr(0, sep) : ".";
+    // hls/tb/ -> ../../ -> repo root -> golden/test_vectors.txt
+    return dir + "/../../golden/test_vectors.txt";
 }
 
 static bool read_poly(FILE *fp, int poly[N]) {
