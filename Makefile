@@ -7,7 +7,7 @@ RUN_HLS = python scripts/run_hls_win.py $(1)
 NTT_N ?= 4
 NTT_Q ?= 17
 
-.PHONY: golden golden-kyber vectors twiddle hls-csim-barrett hls-csim-ntt-engine hls-csim-mul-ntt hls-csim hls-synth sim clean help
+.PHONY: golden golden-kyber vectors twiddle hls-csim-barrett hls-csim-ntt-engine hls-csim-mul-ntt hls-csim hls-synth sim clean clean-sim clean-hls help
 
 help:
 	@echo "Targets:"
@@ -21,7 +21,9 @@ help:
 	@echo "  hls-csim             -- Vitis C-sim: full pipeline tb_ntt_top (M6)"
 	@echo "  hls-synth            -- HLS synthesis + IP export to vivado/ip_repo (M6)"
 	@echo "  sim                  -- SystemVerilog simulation via Icarus (M8)"
-	@echo "  clean                -- remove all generated artifacts"
+	@echo "  clean                -- remove all generated artifacts (HLS build + sim)"
+	@echo "  clean-sim            -- remove only sim artifacts (preserves HLS build/synthesis)"
+	@echo "  clean-hls            -- remove only HLS build artifacts"
 
 NTT_VECTORS ?= 16
 
@@ -55,7 +57,11 @@ hls-synth:
 sim:
 	bash scripts/run_sim.sh
 
-clean:
-	rm -rf build/
+clean-sim:
 	rm -f sim/*.vvp sim/*.vcd sim/*.fst sim/*.log
+
+clean-hls:
+	rm -rf build/hls/
+
+clean: clean-sim clean-hls
 	rm -f hls/src/twiddle_rom.h vivado/twiddle.coe vivado/slot_zeta.coe
