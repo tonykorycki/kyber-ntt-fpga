@@ -37,10 +37,24 @@ def validate_params(n: int, q: int) -> None:
     """Abort with a clear message if (n, q) cannot support a Kyber-style NTT."""
     try:
         from sympy import isprime
-        if not isprime(q):
-            sys.exit(f"Error: q={q} is not prime.")
+        q_is_prime = isprime(q)
     except ImportError:
-        pass  # sympy optional — KyberNTTConfig._validate will catch bad params
+        # Lightweight fallback so bad q values still fail with a clear message
+        # instead of propagating a later ValueError/stack trace.
+        if q < 2:
+            q_is_prime = False
+        elif q % 2 == 0:
+            q_is_prime = (q == 2)
+        else:
+            q_is_prime = True
+            limit = math.isqrt(q)
+            for d in range(3, limit + 1, 2):
+                if q % d == 0:
+                    q_is_prime = False
+                    break
+
+    if not q_is_prime:
+        sys.exit(f"Error: q={q} is not prime.")
 
     if n & (n - 1) != 0 or n < 4:
         sys.exit(f"Error: n={n} must be a power of 2 >= 4.")
