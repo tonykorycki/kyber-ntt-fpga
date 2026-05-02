@@ -9,6 +9,7 @@
 
 #include "../src/ntt_top.h"
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <string>
 
