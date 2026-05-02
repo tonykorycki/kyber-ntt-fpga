@@ -10,22 +10,24 @@
 // All other .sv files are purely structural.
 
 module bram_mux #(
-    parameter   ADDR_W = 8,
-    parameter   DATA_W = 12
+    parameter ADDR_W = 32,
+    parameter DATA_W = 16,
+    parameter WEN_W  = 2  
 )(
-    input logic              ps_own,
+    input  logic              ps_own,
 
-    input logic              ps_en, hls_en,
-    input logic              ps_we, hls_we,
-    input logic [ADDR_W-1:0] ps_addr, hls_addr,
-    input logic [DATA_W-1:0] ps_din, hls_din,
-    input logic [DATA_W-1:0] bram_dout,
+    input  logic              ps_en, hls_en,
+    input  logic [WEN_W-1:0]  ps_we, hls_we,
+    input  logic [ADDR_W-1:0] ps_addr, hls_addr,
+    input  logic [DATA_W-1:0] ps_din, hls_din,
+    input  logic [DATA_W-1:0] bram_dout,
 
     output logic              bram_en,
-    output logic              bram_we,
+    output logic [WEN_W-1:0]  bram_we,
     output logic [ADDR_W-1:0] bram_addr,
-    output logic [DATA_W-1:0] ps_dout, hls_dout,
-    output logic [DATA_W-1:0] bram_din
+    output logic [DATA_W-1:0] bram_din,
+    output logic [DATA_W-1:0] ps_dout, hls_dout
+
 );
 
     assign bram_addr = ps_own ? ps_addr : hls_addr;
