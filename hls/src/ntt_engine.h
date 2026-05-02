@@ -38,7 +38,14 @@ static const barrett_const_t BARRETT_M = (barrett_const_t(1) << (2 * BARRETT_K))
 // pipeline per stage. Eliminates pipeline drain/restart between blocks (~128 gaps at N=256).
 // Costs a div+mul per butterfly to compute element indices from the flat loop counter.
 // Leave undefined for the baseline nested-loop structure (easier to read and verify).
-// #define NTT_FLAT_PIPELINE
+#define NTT_FLAT_PIPELINE
+#define NTT_PREFETCH_READ
+
+#ifdef NTT_PREFETCH_READ
+#ifndef NTT_FLAT_PIPELINE
+#error "NTT_PREFETCH_READ requires NTT_FLAT_PIPELINE"
+#endif
+#endif
 
 // Forward NTT  (Cooley-Tukey):   ntt_engine(a, false)
 // Inverse NTT  (Gentleman-Sande): ntt_engine(a, true)
