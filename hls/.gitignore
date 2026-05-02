@@ -3,18 +3,18 @@
 /export
 
 # Ignore object files and dependent files
-.o
-.d
+*.o
+*.d
 
 #Ignore logs folder and log files
 /logs
-.log
+*.log
 
 #Ignore lock files
-.lock
+*.lock
 
-.bin
-.pdi
+*.bin
+*.pdi
 .vitisWorkspace.json
 
 _ide/
