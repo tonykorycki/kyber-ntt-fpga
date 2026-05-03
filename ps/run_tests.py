@@ -5,14 +5,14 @@ import subprocess
 import os
 import sys
 
-DRIVER  = os.path.join(os.path.dirname(__file__), 'ntt_driver')
-VECTORS = os.path.join(os.path.dirname(__file__), '../golden/test_vectors.txt')
+DRIVER  = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ntt_driver')
+VECTORS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../golden/test_vectors.txt')
 N = 256
 Q = 3329
 
 def load_vectors(path, max_vectors=3):
     vectors = []
-    with open(path) as f:
+    with open(path, encoding='utf-8', errors='replace') as f:
         lines = [l.strip() for l in f if l.strip() and not l.startswith('#')]
     for i in range(0, len(lines) - 2, 3):
         a = list(map(int, lines[i].split()))
@@ -32,7 +32,7 @@ if not vectors:
 passed = 0
 for idx, (a, b, expected) in enumerate(vectors):
     inp = ' '.join(map(str, a + b))
-    r = subprocess.run(['sudo', DRIVER], input=inp, capture_output=True, text=True)
+    r = subprocess.run(['sudo', DRIVER], input=inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     if r.returncode != 0:
         print(f'vector {idx}: driver error — {r.stderr.strip()}')
         continue
