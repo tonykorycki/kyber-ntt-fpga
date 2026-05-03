@@ -4,7 +4,13 @@ CFLAGS  = -O2 -Wall
 ntt_driver: ntt_driver.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+test: ntt_driver
+	python3 run_tests.py
+
+bench: ntt_driver
+	sudo ./ntt_driver -t
+
 clean:
 	rm -f ntt_driver
 
-.PHONY: clean
+.PHONY: test bench clean
