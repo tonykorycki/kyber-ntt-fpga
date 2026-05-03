@@ -11,7 +11,7 @@ vivado/*.xpr
 vivado/*.jou
 vivado/*.str
 vivado/.Xil/
-vivado/ntt_project/
+vivado/proj/
 vivado/ip_repo/*
 !vivado/ip_repo/.gitkeep
 vivado/ip_repo.zip
@@ -34,6 +34,10 @@ sim/*.log
 hls/src/twiddle_rom.h
 rtl/*.mem
 
+# bram_mux IP packaging artifacts (source .sv is tracked, packaging is generated)
+rtl/bram_mux_ip/*
+!rtl/bram_mux_ip/bram_mux.sv
+
 # Test vector files
 golden/*.txt
 golden/*.npy
@@ -50,8 +54,6 @@ Thumbs.db
 .ipynb_checkpoints/
 
 # PYNQ overlay artifacts
-*.bit
-*.hwh
 *.tcl.bak
 
 # docs for me only
