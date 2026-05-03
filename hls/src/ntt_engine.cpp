@@ -32,10 +32,9 @@ static coef_t mod_sub(coef_t a, coef_t b) {
 }
 
 void ntt_engine(coef_t a[N], bool inverse) {
-#pragma HLS ARRAY_PARTITION variable=a cyclic factor=2 dim=1
+// #pragma HLS ARRAY_PARTITION variable=a cyclic factor=2 dim=1
 
     if (!inverse) {
-
 #ifdef NTT_FLAT_PIPELINE
         // Flat forward NTT: counter-based addressing, no barrel shifters.
         int k = 0;

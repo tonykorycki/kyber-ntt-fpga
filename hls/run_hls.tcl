@@ -60,14 +60,29 @@ add_files -tb $tb
 
 open_solution -reset solution1
 set_part xc7z020clg400-1
-create_clock -period 10
+create_clock -period 15
 
 # --- Run ---
 csim_design
 
 if {$do_synth} {
     csynth_design
+
+    # Clear ip_repo before export so stale files from previous synth don't linger
+    foreach f [glob -nocomplain $root/vivado/ip_repo/*] {
+        if {[file tail $f] ne ".gitkeep"} {
+            file delete -force $f
+        }
+    }
+
     export_design -format ip_catalog -output $root/vivado/ip_repo
+
+    # Unzip export artifact if Vitis exported a zip instead of a directory
+    set zipfile $root/vivado/ip_repo/export.zip
+    if {[file exists $zipfile]} {
+        exec powershell -Command \
+            "Expand-Archive -Path '$zipfile' -DestinationPath '$root/vivado/ip_repo' -Force"
+    }
 }
 
 close_project

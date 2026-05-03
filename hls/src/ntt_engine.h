@@ -39,7 +39,7 @@ static const barrett_const_t BARRETT_M = (barrett_const_t(1) << (2 * BARRETT_K))
 // Costs a div+mul per butterfly to compute element indices from the flat loop counter.
 // Leave undefined for the baseline nested-loop structure (easier to read and verify).
 #define NTT_FLAT_PIPELINE
-#define NTT_PREFETCH_READ
+// #define NTT_PREFETCH_READ
 
 #ifdef NTT_PREFETCH_READ
 #ifndef NTT_FLAT_PIPELINE
