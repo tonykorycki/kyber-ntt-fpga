@@ -1,15 +1,12 @@
 /*
  * ps/ntt_driver.c — PS-side driver for ntt_top HLS IP
  *
- * Uses udmabuf for physically contiguous DMA buffers and /dev/mem for
- * AXI-Lite CTRL register access.
- *
- * Setup (run once on the board if udmabuf0 doesn't exist):
- *   modprobe u-dma-buf udmabuf0=1536
+ * Uses /dev/xlnk for CMA buffer allocation (Xilinx kernel driver, standard
+ * on PYNQ images) and /dev/mem for AXI-Lite CTRL register access.
  *
  * Usage:
- *   echo "<256 a coeffs> <256 b coeffs>" | ./ntt_driver
- *   ./ntt_driver -t        # latency benchmark (10 iterations, random inputs)
+ *   ./ntt_driver -t                              # latency benchmark, 10 iterations
+ *   echo "<a0..a255> <b0..b255>" | sudo ./ntt_driver   # single multiply
  *
  * Output:
  *   stdout — 256 c coefficients, one per line
@@ -27,18 +24,30 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/mman.h>
+#include <sys/ioctl.h>
 
-// Hardware constants 
+// xlnk ioctl interface — from linux/xlnk-ioctl.h (Xilinx kernel tree)
+#define XLNK_IOCALLOCBUF   _IOWR('X', 2, struct xlnk_args)
+#define XLNK_IOCFREEBUF    _IOWR('X', 3, struct xlnk_args)
+
+struct xlnk_args {
+    uint32_t  id;
+    uint32_t  flags;
+    uint32_t  len;
+    uint32_t  phyaddr;
+    void     *virt;
+    uint32_t  padding[3];
+};
+
 #define CTRL_PHYS   0x40000000UL
 #define CTRL_SIZE   0x10000
 
 #define N           256
 #define Q           3329
 
-// AXI-Lite CTRL register offsets (from HLS synthesis, ntt_top_CTRL_s_axi.v)
 #define OFF_CTRL    0x00
-#define OFF_A1      0x10    // lower 32b of array a physical address 
-#define OFF_A2      0x14    // upper 32b — always 0 on 32-bit PS 
+#define OFF_A1      0x10
+#define OFF_A2      0x14
 #define OFF_B1      0x1C
 #define OFF_B2      0x20
 #define OFF_C1      0x28
@@ -48,57 +57,24 @@
 #define AP_DONE     0x2
 #define AP_IDLE     0x4
 
-// Buffer layout in one udmabuf allocation: [a:512B][b:512B][c:512B]
-#define COEF_BYTES  (N * sizeof(uint16_t))   // 512 bytes per array 
-#define TOTAL_BUF   (3 * COEF_BYTES)         // 1536 bytes total 
+// 512 bytes per array, 1536 total — one xlnk allocation split into [a][b][c]
+#define COEF_BYTES  (N * sizeof(uint16_t))
+#define TOTAL_BUF   (3 * COEF_BYTES)
 
-// MMIO helpers 
 static volatile uint32_t *ctrl_regs;
 
-static inline void wreg(uint32_t off, uint32_t val)
-{
-    ctrl_regs[off >> 2] = val;
-}
+static inline void wreg(uint32_t off, uint32_t val) { ctrl_regs[off >> 2] = val; }
+static inline uint32_t rreg(uint32_t off)           { return ctrl_regs[off >> 2]; }
 
-static inline uint32_t rreg(uint32_t off)
-{
-    return ctrl_regs[off >> 2];
-}
-
-// udmabuf cache sync
-static void sync_to_device(void)
-{
-    // Flushes CPU dcache so device sees fresh data in DDR
-    FILE *f = fopen("/sys/class/u-dma-buf/udmabuf0/sync_for_device", "w");
-    if (f) { fputs("1", f); fclose(f); }
-}
-
-static void sync_to_cpu(void)
-{
-    // Invalidate CPU dcache
-    FILE *f = fopen("/sys/class/u-dma-buf/udmabuf0/sync_for_cpu", "w");
-    if (f) { fputs("1", f); fclose(f); }
-}
-
-// Core NTT multiply 
-/*
- * ntt_mul — run the HLS IP for one polynomial multiplication.
- *
- * a, b : input coefficients (uint16_t, values in [0, Q))
- * c    : output coefficients (uint16_t, values in [0, Q))
- * pa, pb, pc : physical addresses of a, b, c in the udmabuf region
- *
- * Returns wall-clock latency of the HLS execution in nanoseconds.
- */
 static long ntt_mul(uint16_t *a, uint16_t *b, uint16_t *c,
                     uint32_t pa, uint32_t pb, uint32_t pc)
 {
     struct timespec t0, t1;
 
-    // Flush dcache: HP port bypasses ARM cache, HLS reads from DDR
-    sync_to_device();
+    // HP port bypasses ARM L1/L2 — flush a/b before HLS reads, invalidate c after
+    __builtin___clear_cache((char *)a, (char *)a + COEF_BYTES);
+    __builtin___clear_cache((char *)b, (char *)b + COEF_BYTES);
 
-    // Write pointer registers (64-bit split; upper always 0 on 32-bit PS)
     wreg(OFF_A1, pa);  wreg(OFF_A2, 0);
     wreg(OFF_B1, pb);  wreg(OFF_B2, 0);
     wreg(OFF_C1, pc);  wreg(OFF_C2, 0);
@@ -109,21 +85,16 @@ static long ntt_mul(uint16_t *a, uint16_t *b, uint16_t *c,
         ;
     clock_gettime(CLOCK_MONOTONIC, &t1);
 
-    // Invalidate dcache: HLS wrote c to DDR, cache may hold stale zeros
-    sync_to_cpu();
-
-    (void)a; (void)b; (void)c;   // a/b written by caller; c read by caller
+    __builtin___clear_cache((char *)c, (char *)c + COEF_BYTES);
 
     return (t1.tv_sec - t0.tv_sec) * 1000000000L
          + (t1.tv_nsec - t0.tv_nsec);
 }
 
-// entry point
 int main(int argc, char *argv[])
 {
     int benchmark = (argc > 1 && strcmp(argv[1], "-t") == 0);
 
-    // Map CTRL registers 
     int mem_fd = open("/dev/mem", O_RDWR | O_SYNC);
     if (mem_fd < 0) { perror("open /dev/mem"); return 1; }
 
@@ -131,76 +102,56 @@ int main(int argc, char *argv[])
                      MAP_SHARED, mem_fd, CTRL_PHYS);
     if (ctrl_regs == MAP_FAILED) { perror("mmap ctrl"); return 1; }
 
-    // Read physical address from udmabuf sysfs
-    uint32_t phys_base;
-    {
-        FILE *f = fopen("/sys/class/u-dma-buf/udmabuf0/phys_addr", "r");
-        if (!f) {
-            fprintf(stderr,
-                "udmabuf0 not found. Run:\n"
-                "  sudo modprobe u-dma-buf udmabuf0=%u\n", (unsigned)TOTAL_BUF);
-            return 1;
-        }
-        if (fscanf(f, "%x", &phys_base) != 1) {
-            fclose(f); fprintf(stderr, "failed to read phys_addr\n"); return 1;
-        }
-        fclose(f);
+    int xlnk_fd = open("/dev/xlnk", O_RDWR);
+    if (xlnk_fd < 0) { perror("open /dev/xlnk"); return 1; }
+
+    struct xlnk_args xargs = { .len = TOTAL_BUF, .flags = 0 };
+    if (ioctl(xlnk_fd, XLNK_IOCALLOCBUF, &xargs) < 0) {
+        perror("xlnk alloc"); return 1;
     }
 
-    // mmap udmabuf virtual address
-    int udma_fd = open("/dev/udmabuf0", O_RDWR | O_SYNC);
-    if (udma_fd < 0) { perror("open /dev/udmabuf0"); return 1; }
+    void *virt = mmap(NULL, TOTAL_BUF, PROT_READ | PROT_WRITE,
+                      MAP_SHARED, xlnk_fd, xargs.phyaddr);
+    if (virt == MAP_FAILED) { perror("mmap xlnk buf"); return 1; }
 
-    uint8_t *virt = mmap(NULL, TOTAL_BUF, PROT_READ | PROT_WRITE,
-                         MAP_SHARED, udma_fd, 0);
-    if (virt == MAP_FAILED) { perror("mmap udmabuf"); return 1; }
+    uint16_t *a = (uint16_t *)((uint8_t *)virt + 0 * COEF_BYTES);
+    uint16_t *b = (uint16_t *)((uint8_t *)virt + 1 * COEF_BYTES);
+    uint16_t *c = (uint16_t *)((uint8_t *)virt + 2 * COEF_BYTES);
 
-    uint16_t *a = (uint16_t *)(virt + 0 * COEF_BYTES);
-    uint16_t *b = (uint16_t *)(virt + 1 * COEF_BYTES);
-    uint16_t *c = (uint16_t *)(virt + 2 * COEF_BYTES);
+    uint32_t pa = xargs.phyaddr;
+    uint32_t pb = xargs.phyaddr + COEF_BYTES;
+    uint32_t pc = xargs.phyaddr + 2 * COEF_BYTES;
 
-    uint32_t pa = phys_base;
-    uint32_t pb = phys_base + COEF_BYTES;
-    uint32_t pc = phys_base + 2 * COEF_BYTES;
-
-    // Wait for IP idle
-    if (!(rreg(OFF_CTRL) & AP_IDLE)) {
+    if (!(rreg(OFF_CTRL) & AP_IDLE))
         fprintf(stderr, "WARNING: HLS IP not idle at startup\n");
-    }
 
     if (benchmark) {
-        // Latency benchmark: 10 runs with fixed input 
-        for (int i = 0; i < N; i++) { a[i] = (uint16_t)(i % Q); }
-        for (int i = 0; i < N; i++) { b[i] = (uint16_t)((i * 7 + 1) % Q); }
+        for (int i = 0; i < N; i++) a[i] = (uint16_t)(i % Q);
+        for (int i = 0; i < N; i++) b[i] = (uint16_t)((i * 7 + 1) % Q);
 
         long total_ns = 0;
-        int reps = 10;
+        const int reps = 10;
         for (int r = 0; r < reps; r++) {
             memset(c, 0, COEF_BYTES);
             total_ns += ntt_mul(a, b, c, pa, pb, pc);
         }
         fprintf(stderr, "avg latency: %ld ns  (%ld us)  over %d reps\n",
                 total_ns / reps, total_ns / reps / 1000, reps);
-
-        // Print last result
         for (int i = 0; i < N; i++)
             printf("%u\n", (unsigned)(c[i] % Q));
 
     } else {
-        // Normal mode: read a/b from stdin, print c to stdout
         for (int i = 0; i < N; i++) {
             unsigned v;
             if (scanf("%u", &v) != 1) {
-                fprintf(stderr, "error: expected %d values for a, got %d\n", N, i);
-                return 1;
+                fprintf(stderr, "error reading a[%d]\n", i); return 1;
             }
             a[i] = (uint16_t)(v % Q);
         }
         for (int i = 0; i < N; i++) {
             unsigned v;
             if (scanf("%u", &v) != 1) {
-                fprintf(stderr, "error: expected %d values for b, got %d\n", N, i);
-                return 1;
+                fprintf(stderr, "error reading b[%d]\n", i); return 1;
             }
             b[i] = (uint16_t)(v % Q);
         }
@@ -208,14 +159,14 @@ int main(int argc, char *argv[])
 
         long ns = ntt_mul(a, b, c, pa, pb, pc);
         fprintf(stderr, "latency: %ld ns\n", ns);
-
         for (int i = 0; i < N; i++)
             printf("%u\n", (unsigned)(c[i] % Q));
     }
 
-    munmap((void *)ctrl_regs, CTRL_SIZE);
+    ioctl(xlnk_fd, XLNK_IOCFREEBUF, &xargs);
     munmap(virt, TOTAL_BUF);
+    munmap((void *)ctrl_regs, CTRL_SIZE);
+    close(xlnk_fd);
     close(mem_fd);
-    close(udma_fd);
     return 0;
 }
