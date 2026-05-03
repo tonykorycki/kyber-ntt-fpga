@@ -63,6 +63,9 @@ assignment.md
 dfx_runtime.txt
 logs/
 
+#cocotb
+sim/sim_build/*
+
 # ai stuff
 *.log
 .claude
