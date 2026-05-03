@@ -28,27 +28,22 @@ kyber_schoolbook (a, b, q=3329) -> schoolbook_mul
 import argparse
 import os
 import random
-from dataclasses import dataclass
 from typing import List
 
 
-# ---------------------------------------------------------------------------
-# Config dataclass
-# ---------------------------------------------------------------------------
-
-@dataclass
 class KyberNTTConfig:
-    n: int           # polynomial degree (power of 2, >= 4)
-    q: int           # prime modulus
-    zeta: int        # primitive N-th root of unity mod Q
-    half_n: int      # n // 2  —  number of quadratic slots
-    bits: int        # log2(half_n)  —  bit-reversal width
-    inv_half_n: int  # (n/2)^{-1} mod q  —  INTT scaling factor
-    barrett_k: int   # bit-width parameter for Barrett reduction
-    barrett_m: int   # Barrett multiplier: floor(2^{2k} / q)
+    def __init__(self, n, q, zeta, half_n, bits, inv_half_n, barrett_k, barrett_m):
+        self.n          = n
+        self.q          = q
+        self.zeta       = zeta
+        self.half_n     = half_n
+        self.bits       = bits
+        self.inv_half_n = inv_half_n
+        self.barrett_k  = barrett_k
+        self.barrett_m  = barrett_m
 
     @classmethod
-    def from_params(cls, n: int, q: int, zeta: int = None) -> 'KyberNTTConfig':
+    def from_params(cls, n, q, zeta=None):
         """Build a config for (N, Q). Finds ZETA automatically if not given."""
         if zeta is None:
             zeta = _find_zeta(n, q)
