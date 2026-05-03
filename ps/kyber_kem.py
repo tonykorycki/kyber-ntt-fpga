@@ -14,6 +14,7 @@ Two multiply backends are exported:
 import os
 import sys
 import random
+import struct
 import subprocess
 import time
 from typing import List, Callable, Tuple
@@ -45,20 +46,19 @@ def _get_hw_proc():
     global _hw_proc
     if _hw_proc is None or _hw_proc.poll() is not None:
         _hw_proc = subprocess.Popen(
-            ['sudo', DRIVER, '-b'],
+            ['sudo', DRIVER, '-r'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            bufsize=1,
-            universal_newlines=True,
         )
     return _hw_proc
 
 
 def ntt_mul_hw(a: Poly, b: Poly) -> Poly:
     proc = _get_hw_proc()
-    proc.stdin.write(' '.join(map(str, a + b)) + '\n')
+    proc.stdin.write(struct.pack('512H', *(a + b)))
     proc.stdin.flush()
-    return list(map(int, proc.stdout.readline().split()))
+    raw = proc.stdout.read(N * 2)
+    return list(struct.unpack('256H', raw))
 
 
 class KyberKEM:
