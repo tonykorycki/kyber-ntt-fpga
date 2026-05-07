@@ -82,6 +82,7 @@ int main(int argc, char *argv[])
 {
     int benchmark = (argc > 1 && strcmp(argv[1], "-t") == 0);
     int batch     = (argc > 1 && strcmp(argv[1], "-b") == 0);
+    int raw       = (argc > 1 && strcmp(argv[1], "-r") == 0);
 
     int mem_fd = open("/dev/mem", O_RDWR | O_SYNC);
     if (mem_fd < 0) { perror("open /dev/mem"); return 1; }
@@ -119,6 +120,17 @@ int main(int argc, char *argv[])
                 total_ns / reps, total_ns / reps / 1000, reps);
         for (int i = 0; i < N; i++)
             printf("%u\n", (unsigned)(c[i] % Q));
+
+    } else if (raw) {
+        while (fread(a, sizeof(uint16_t), N, stdin) == (size_t)N) {
+            if (fread(b, sizeof(uint16_t), N, stdin) != (size_t)N) break;
+            for (int i = 0; i < N; i++) { a[i] %= Q; b[i] %= Q; }
+            memset(c, 0, COEF_BYTES);
+            ntt_mul(a, b, c, pa, pb, pc);
+            for (int i = 0; i < N; i++) c[i] %= Q;
+            fwrite(c, sizeof(uint16_t), N, stdout);
+            fflush(stdout);
+        }
 
     } else if (batch) {
         unsigned v;
