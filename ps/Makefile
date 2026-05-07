@@ -2,7 +2,7 @@ CC      = gcc
 CFLAGS  = -O2 -Wall
 
 ntt_driver: ntt_driver.c
-	$(CC) $(CFLAGS) -o $@ $< -lcma -lpthread
+	$(CC) $(CFLAGS) -o $@ $<
 
 test: ntt_driver
 	python3 run_tests.py
