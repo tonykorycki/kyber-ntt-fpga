@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-golden/gen_test_vectors.py — Generate test vectors for HLS C-sim and SV simulation.
+golden/gen_test_vectors.py - Generate test vectors for HLS C-sim and SV simulation.
 
 Output: golden/test_vectors.txt
 Format per vector (3 lines):
