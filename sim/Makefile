@@ -36,14 +36,13 @@ COMPILE_ARGS += -g2012
 # Dump waveforms for post-sim debug with GTKWave
 COMPILE_ARGS += -DCOCOTB_SIM=1
 
-# Wave dump via cocotb's built-in VCD support (set WAVES=1 to enable)
+# Wave dump (set WAVES=1 to enable) — writes dump.vcd in sim/
+# wave_dump.v uses $dumpfile/$dumpvars; must be elaborated as a second top-level.
 ifeq ($(WAVES),1)
+VERILOG_SOURCES += wave_dump.v
+COMPILE_ARGS    += -s wave_dump
 COCOTB_HDL_TIMEUNIT      = 1ns
 COCOTB_HDL_TIMEPRECISION = 1ps
-export COCOTB_ENABLE_COVERAGE = 0
-# iverilog will write sim_build/ntt_top.vcd; open with:
-#   gtkwave sim_build/ntt_top.vcd
-PLUSARGS += +dumpfile=sim_build/ntt_top.vcd +dumpvars=0
 endif
 
 # ── Timeout note ──────────────────────────────────────────────────────────────
@@ -56,6 +55,6 @@ include $(shell cocotb-config --makefiles)/Makefile.sim
 
 # ── Convenience targets ───────────────────────────────────────────────────────
 waves:
-	gtkwave sim_build/ntt_top.vcd &
+	gtkwave dump.vcd &
 
 .PHONY: waves

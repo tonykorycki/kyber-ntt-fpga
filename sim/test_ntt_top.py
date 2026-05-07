@@ -122,7 +122,8 @@ async def test_ntt_top_poly_mul(dut):
 
     await reset_dut(dut)
 
-    vectors = load_test_vectors("golden/test_vectors.txt", max_vectors=64)
+    max_v   = int(os.environ.get("NTT_MAX_VECTORS", 64))
+    vectors = load_test_vectors("golden/test_vectors.txt", max_vectors=max_v)
     if not vectors:
         assert False, "No test vectors loaded — check golden/test_vectors.txt"
 
