@@ -65,6 +65,8 @@ logs/
 
 #cocotb
 sim/sim_build/*
+sim/*.xml
+sim/*.dat
 
 # ai stuff
 *.log
