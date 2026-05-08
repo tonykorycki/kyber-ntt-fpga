@@ -24,8 +24,6 @@ _GOLDEN = '/home/xilinx/jupyter_notebooks/kyber-ntt-fpga/golden'
 sys.path.insert(0, _GOLDEN)
 from kyber_ntt import poly_mul, KYBER_256
 
-DRIVER = os.path.join(_PS, 'ntt_driver')
-
 N   = 256
 Q   = 3329
 K   = 2
@@ -40,25 +38,61 @@ def ntt_mul_sw(a: Poly, b: Poly) -> Poly:
     return poly_mul(a, b, KYBER_256)
 
 
-_hw_proc = None
+def get_last_hw_latency_us() -> float:
+    """Return the C-driver-measured latency (clock_gettime) of the last ntt_mul_hw call."""
+    return last_hw_latency_us
 
-def _get_hw_proc():
+
+_DRIVER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ntt_driver')
+
+last_hw_latency_us: float = 0.0  # latency of the last ntt_mul_hw call, from C clock_gettime
+
+_hw_proc = None  # persistent ntt_driver -r subprocess
+
+_RESULT_BYTES = N * 2 + 8  # N uint16_t coefficients + int64_t nanoseconds
+
+
+def _read_exact(f, n):
+    buf = b''
+    while len(buf) < n:
+        chunk = f.read(n - len(buf))
+        if not chunk:
+            raise EOFError('ntt_driver subprocess closed unexpectedly')
+        buf += chunk
+    return buf
+
+
+def _hw_init():
     global _hw_proc
-    if _hw_proc is None or _hw_proc.poll() is not None:
-        _hw_proc = subprocess.Popen(
-            ['sudo', DRIVER, '-r'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-        )
-    return _hw_proc
+    if _hw_proc is not None:
+        return
+    for cmd in [[_DRIVER, '-r'], ['sudo', _DRIVER, '-r']]:
+        try:
+            _hw_proc = subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+            )
+            return
+        except Exception:
+            continue
+    raise RuntimeError(f'Could not start ntt_driver at {_DRIVER}')
 
 
 def ntt_mul_hw(a: Poly, b: Poly) -> Poly:
-    proc = _get_hw_proc()
-    proc.stdin.write(struct.pack('512H', *(a + b)))
-    proc.stdin.flush()
-    raw = proc.stdout.read(N * 2)
-    return list(struct.unpack('256H', raw))
+    global last_hw_latency_us
+    _hw_init()
+    a_clamped = [x % Q for x in a]
+    b_clamped = [x % Q for x in b]
+    payload = struct.pack(f'{N}H{N}H', *a_clamped, *b_clamped)
+    _hw_proc.stdin.write(payload)
+    _hw_proc.stdin.flush()
+    raw = _read_exact(_hw_proc.stdout, _RESULT_BYTES)
+    c = list(struct.unpack(f'{N}H', raw[:N * 2]))
+    ns = struct.unpack('<q', raw[N * 2:])[0]
+    last_hw_latency_us = ns / 1000.0
+    return [x % Q for x in c]
 
 
 class KyberKEM:
@@ -159,6 +193,24 @@ def _pack_secret(bits: List[int]) -> bytes:
     for i in range(min(256, N)):
         out[i // 8] |= bits[i] << (i % 8)
     return bytes(out)
+
+
+def verify_multiply(multiply_fn: Callable) -> tuple:
+    """
+    Check multiply_fn against the SW golden model on 3 known inputs.
+    Returns (passed: bool, detail: str).
+    KEM noise tolerance can mask wrong multiplications; this check cannot.
+    """
+    rng = random.Random(0xdeadbeef)
+    for i in range(3):
+        a = [rng.randint(0, Q - 1) for _ in range(N)]
+        b = [rng.randint(0, Q - 1) for _ in range(N)]
+        got      = multiply_fn(a, b)
+        expected = ntt_mul_sw(a, b)
+        mismatches = sum(g % Q != e % Q for g, e in zip(got, expected))
+        if mismatches:
+            return False, f'vector {i}: {mismatches} coefficient mismatches (first: got {got[next(j for j,(g,e) in enumerate(zip(got,expected)) if g%Q!=e%Q)] % Q}, expected {expected[next(j for j,(g,e) in enumerate(zip(got,expected)) if g%Q!=e%Q)] % Q})'
+    return True, 'all 3 spot-check vectors match golden model'
 
 
 def run_kem(multiply_fn: Callable, seed: int = 42) -> dict:

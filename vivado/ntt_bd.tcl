@@ -129,10 +129,15 @@ set bCheckIPsPassed 1
 set bCheckIPs 1
 if { $bCheckIPs == 1 } {
    set list_check_ips "\ 
-xilinx.com:ip:processing_system7:5.5\
 xilinx.com:hls:ntt_top:1.0\
+xilinx.com:ip:processing_system7:5.5\
+xilinx.com:ip:blk_mem_gen:8.4\
+xilinx.com:ip:axi_bram_ctrl:4.1\
+xilinx.com:ip:axi_gpio:2.0\
 xilinx.com:ip:smartconnect:1.0\
 xilinx.com:ip:proc_sys_reset:5.0\
+xilinx.com:ip:xlconcat:2.1\
+xilinx.com:ip:xlconstant:1.1\
 "
 
    set list_ips_missing ""
@@ -196,12 +201,11 @@ proc create_root_design { parentCell } {
 
 
   # Create interface ports
-  set DDR [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:ddrx_rtl:1.0 DDR ]
-
-  set FIXED_IO [ create_bd_intf_port -mode Master -vlnv xilinx.com:display_processing_system7:fixedio_rtl:1.0 FIXED_IO ]
-
 
   # Create ports
+
+  # Create instance: ntt_top_0, and set properties
+  set ntt_top_0 [ create_bd_cell -type ip -vlnv xilinx.com:hls:ntt_top:1.0 ntt_top_0 ]
 
   # Create instance: processing_system7_0, and set properties
   set processing_system7_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7:5.5 processing_system7_0 ]
@@ -211,7 +215,7 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_ACT_DCI_PERIPHERAL_FREQMHZ {10.158730} \
     CONFIG.PCW_ACT_ENET0_PERIPHERAL_FREQMHZ {10.000000} \
     CONFIG.PCW_ACT_ENET1_PERIPHERAL_FREQMHZ {10.000000} \
-    CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {66.666672} \
+    CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {100.000000} \
     CONFIG.PCW_ACT_FPGA1_PERIPHERAL_FREQMHZ {10.000000} \
     CONFIG.PCW_ACT_FPGA2_PERIPHERAL_FREQMHZ {10.000000} \
     CONFIG.PCW_ACT_FPGA3_PERIPHERAL_FREQMHZ {10.000000} \
@@ -229,65 +233,207 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_ACT_TTC1_CLK2_PERIPHERAL_FREQMHZ {111.111115} \
     CONFIG.PCW_ACT_UART_PERIPHERAL_FREQMHZ {10.000000} \
     CONFIG.PCW_ACT_WDT_PERIPHERAL_FREQMHZ {111.111115} \
-    CONFIG.PCW_CLK0_FREQ {66666672} \
+    CONFIG.PCW_CLK0_FREQ {100000000} \
     CONFIG.PCW_CLK1_FREQ {10000000} \
     CONFIG.PCW_CLK2_FREQ {10000000} \
     CONFIG.PCW_CLK3_FREQ {10000000} \
     CONFIG.PCW_DDR_RAM_HIGHADDR {0x1FFFFFFF} \
-    CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {66.667} \
+    CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {100} \
     CONFIG.PCW_FPGA_FCLK0_ENABLE {1} \
     CONFIG.PCW_UIPARAM_ACT_DDR_FREQ_MHZ {533.333374} \
     CONFIG.PCW_USE_AXI_NONSECURE {1} \
-    CONFIG.PCW_USE_S_AXI_HP0 {1} \
   ] $processing_system7_0
 
 
-  # Create instance: ntt_top_0, and set properties
-  set ntt_top_0 [ create_bd_cell -type ip -vlnv xilinx.com:hls:ntt_top:1.0 ntt_top_0 ]
+  # Create instance: bram_a, and set properties
+  set bram_a [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.4 bram_a ]
+  set_property -dict [list \
+    CONFIG.Memory_Type {True_Dual_Port_RAM} \
+    CONFIG.Operating_Mode_A {WRITE_FIRST} \
+    CONFIG.Operating_Mode_B {WRITE_FIRST} \
+    CONFIG.Register_PortA_Output_of_Memory_Primitives {false} \
+    CONFIG.Register_PortB_Output_of_Memory_Primitives {false} \
+    CONFIG.Write_Width_B {32} \
+    CONFIG.use_bram_block {BRAM_Controller} \
+  ] $bram_a
+
+
+  # Create instance: axi_bram_a, and set properties
+  set axi_bram_a [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.1 axi_bram_a ]
+
+  # Create instance: bram_c, and set properties
+  set bram_c [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.4 bram_c ]
+  set_property -dict [list \
+    CONFIG.Memory_Type {True_Dual_Port_RAM} \
+    CONFIG.Operating_Mode_A {WRITE_FIRST} \
+    CONFIG.Operating_Mode_B {WRITE_FIRST} \
+    CONFIG.Register_PortA_Output_of_Memory_Primitives {false} \
+    CONFIG.Register_PortB_Output_of_Memory_Primitives {false} \
+    CONFIG.Write_Width_B {32} \
+    CONFIG.use_bram_block {BRAM_Controller} \
+  ] $bram_c
+
+
+  # Create instance: bram_b, and set properties
+  set bram_b [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.4 bram_b ]
+  set_property -dict [list \
+    CONFIG.Memory_Type {True_Dual_Port_RAM} \
+    CONFIG.Operating_Mode_A {WRITE_FIRST} \
+    CONFIG.Operating_Mode_B {WRITE_FIRST} \
+    CONFIG.Register_PortA_Output_of_Memory_Primitives {false} \
+    CONFIG.Register_PortB_Output_of_Memory_Primitives {false} \
+    CONFIG.Write_Width_B {32} \
+    CONFIG.use_bram_block {BRAM_Controller} \
+  ] $bram_b
+
+
+  # Create instance: axi_bram_c, and set properties
+  set axi_bram_c [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.1 axi_bram_c ]
+
+  # Create instance: axi_bram_b, and set properties
+  set axi_bram_b [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.1 axi_bram_b ]
+
+  # Create instance: axi_gpio_0, and set properties
+  set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_0 ]
+  set_property -dict [list \
+    CONFIG.C_ALL_INPUTS_2 {1} \
+    CONFIG.C_ALL_OUTPUTS {1} \
+    CONFIG.C_GPIO2_WIDTH {2} \
+    CONFIG.C_GPIO_WIDTH {1} \
+    CONFIG.C_IS_DUAL {1} \
+  ] $axi_gpio_0
+
 
   # Create instance: axi_smc, and set properties
   set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
-  set_property CONFIG.NUM_SI {1} $axi_smc
+  set_property -dict [list \
+    CONFIG.NUM_MI {4} \
+    CONFIG.NUM_SI {1} \
+  ] $axi_smc
 
 
-  # Create instance: rst_ps7_0_66M, and set properties
-  set rst_ps7_0_66M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_0_66M ]
+  # Create instance: rst_ps7_0_100M, and set properties
+  set rst_ps7_0_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_0_100M ]
 
-  # Create instance: axi_mem_intercon, and set properties
-  set axi_mem_intercon [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_mem_intercon ]
-  set_property CONFIG.NUM_MI {1} $axi_mem_intercon
+  # Create instance: xlconcat_ap, and set properties
+  set xlconcat_ap [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 xlconcat_ap ]
+
+  # Create instance: xlconcat_a, and set properties
+  set xlconcat_a [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 xlconcat_a ]
+  set_property CONFIG.NUM_PORTS {4} $xlconcat_a
+
+
+  # Create instance: xlconcat_c, and set properties
+  set xlconcat_c [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 xlconcat_c ]
+  set_property CONFIG.NUM_PORTS {4} $xlconcat_c
+
+
+  # Create instance: xlconcat_b, and set properties
+  set xlconcat_b [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 xlconcat_b ]
+  set_property CONFIG.NUM_PORTS {4} $xlconcat_b
+
+
+  # Create instance: xlconstant_bram_rtsb, and set properties
+  set xlconstant_bram_rtsb [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_bram_rtsb ]
+  set_property CONFIG.CONST_VAL {0} $xlconstant_bram_rtsb
 
 
   # Create interface connections
-  connect_bd_intf_net -intf_net axi_mem_intercon_M00_AXI [get_bd_intf_pins axi_mem_intercon/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
-  connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins ntt_top_0/s_axi_CTRL]
-  connect_bd_intf_net -intf_net ntt_top_0_m_axi_MAXI [get_bd_intf_pins ntt_top_0/m_axi_MAXI] [get_bd_intf_pins axi_mem_intercon/S00_AXI]
-  connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
-  connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
+  connect_bd_intf_net -intf_net axi_bram_a_BRAM_PORTA [get_bd_intf_pins axi_bram_a/BRAM_PORTA] [get_bd_intf_pins bram_a/BRAM_PORTA]
+  connect_bd_intf_net -intf_net axi_bram_b_BRAM_PORTA [get_bd_intf_pins axi_bram_b/BRAM_PORTA] [get_bd_intf_pins bram_b/BRAM_PORTA]
+  connect_bd_intf_net -intf_net axi_bram_c_BRAM_PORTA [get_bd_intf_pins axi_bram_c/BRAM_PORTA] [get_bd_intf_pins bram_c/BRAM_PORTA]
+  connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins axi_bram_a/S_AXI]
+  connect_bd_intf_net -intf_net axi_smc_M01_AXI [get_bd_intf_pins axi_smc/M01_AXI] [get_bd_intf_pins axi_bram_b/S_AXI]
+  connect_bd_intf_net -intf_net axi_smc_M02_AXI [get_bd_intf_pins axi_smc/M02_AXI] [get_bd_intf_pins axi_bram_c/S_AXI]
+  connect_bd_intf_net -intf_net axi_smc_M03_AXI [get_bd_intf_pins axi_smc/M03_AXI] [get_bd_intf_pins axi_gpio_0/S_AXI]
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins processing_system7_0/M_AXI_GP0] [get_bd_intf_pins axi_smc/S00_AXI]
 
   # Create port connections
+  connect_bd_net -net Net  [get_bd_pins ntt_top_0/b_we0] \
+  [get_bd_pins xlconcat_b/In0] \
+  [get_bd_pins xlconcat_b/In1] \
+  [get_bd_pins xlconcat_b/In2] \
+  [get_bd_pins xlconcat_b/In3]
+  connect_bd_net -net Net1  [get_bd_pins ntt_top_0/c_we0] \
+  [get_bd_pins xlconcat_c/In0] \
+  [get_bd_pins xlconcat_c/In1] \
+  [get_bd_pins xlconcat_c/In2] \
+  [get_bd_pins xlconcat_c/In3]
+  connect_bd_net -net axi_gpio_0_gpio_io_o  [get_bd_pins axi_gpio_0/gpio_io_o] \
+  [get_bd_pins ntt_top_0/ap_start]
+  connect_bd_net -net bram_a_doutb  [get_bd_pins bram_a/doutb] \
+  [get_bd_pins ntt_top_0/a_q0]
+  connect_bd_net -net bram_b_doutb  [get_bd_pins bram_b/doutb] \
+  [get_bd_pins ntt_top_0/b_q0]
+  connect_bd_net -net bram_c_doutb  [get_bd_pins bram_c/doutb] \
+  [get_bd_pins ntt_top_0/c_q0]
+  connect_bd_net -net ntt_top_0_a_address0  [get_bd_pins ntt_top_0/a_address0] \
+  [get_bd_pins bram_a/addrb]
+  connect_bd_net -net ntt_top_0_a_ce0  [get_bd_pins ntt_top_0/a_ce0] \
+  [get_bd_pins bram_a/enb]
+  connect_bd_net -net ntt_top_0_a_d0  [get_bd_pins ntt_top_0/a_d0] \
+  [get_bd_pins bram_a/dinb]
+  connect_bd_net -net ntt_top_0_a_we0  [get_bd_pins ntt_top_0/a_we0] \
+  [get_bd_pins xlconcat_a/In0] \
+  [get_bd_pins xlconcat_a/In1] \
+  [get_bd_pins xlconcat_a/In2] \
+  [get_bd_pins xlconcat_a/In3]
+  connect_bd_net -net ntt_top_0_ap_done  [get_bd_pins ntt_top_0/ap_done] \
+  [get_bd_pins xlconcat_ap/In0]
+  connect_bd_net -net ntt_top_0_ap_idle  [get_bd_pins ntt_top_0/ap_idle] \
+  [get_bd_pins xlconcat_ap/In1]
+  connect_bd_net -net ntt_top_0_b_address0  [get_bd_pins ntt_top_0/b_address0] \
+  [get_bd_pins bram_b/addrb]
+  connect_bd_net -net ntt_top_0_b_ce0  [get_bd_pins ntt_top_0/b_ce0] \
+  [get_bd_pins bram_b/enb]
+  connect_bd_net -net ntt_top_0_b_d0  [get_bd_pins ntt_top_0/b_d0] \
+  [get_bd_pins bram_b/dinb]
+  connect_bd_net -net ntt_top_0_c_address0  [get_bd_pins ntt_top_0/c_address0] \
+  [get_bd_pins bram_c/addrb]
+  connect_bd_net -net ntt_top_0_c_ce0  [get_bd_pins ntt_top_0/c_ce0] \
+  [get_bd_pins bram_c/enb]
+  connect_bd_net -net ntt_top_0_c_d0  [get_bd_pins ntt_top_0/c_d0] \
+  [get_bd_pins bram_c/dinb]
   connect_bd_net -net processing_system7_0_FCLK_CLK0  [get_bd_pins processing_system7_0/FCLK_CLK0] \
   [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] \
-  [get_bd_pins ntt_top_0/ap_clk] \
-  [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] \
   [get_bd_pins axi_smc/aclk] \
-  [get_bd_pins rst_ps7_0_66M/slowest_sync_clk] \
-  [get_bd_pins axi_mem_intercon/ACLK] \
-  [get_bd_pins axi_mem_intercon/S00_ACLK] \
-  [get_bd_pins axi_mem_intercon/M00_ACLK]
+  [get_bd_pins axi_bram_a/s_axi_aclk] \
+  [get_bd_pins rst_ps7_0_100M/slowest_sync_clk] \
+  [get_bd_pins axi_bram_b/s_axi_aclk] \
+  [get_bd_pins axi_bram_c/s_axi_aclk] \
+  [get_bd_pins axi_gpio_0/s_axi_aclk] \
+  [get_bd_pins ntt_top_0/ap_clk] \
+  [get_bd_pins bram_a/clkb] \
+  [get_bd_pins bram_b/clkb] \
+  [get_bd_pins bram_c/clkb]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N  [get_bd_pins processing_system7_0/FCLK_RESET0_N] \
-  [get_bd_pins rst_ps7_0_66M/ext_reset_in]
-  connect_bd_net -net rst_ps7_0_66M_peripheral_aresetn  [get_bd_pins rst_ps7_0_66M/peripheral_aresetn] \
-  [get_bd_pins ntt_top_0/ap_rst_n] \
+  [get_bd_pins rst_ps7_0_100M/ext_reset_in]
+  connect_bd_net -net rst_ps7_0_100M_peripheral_aresetn  [get_bd_pins rst_ps7_0_100M/peripheral_aresetn] \
+  [get_bd_pins axi_bram_a/s_axi_aresetn] \
   [get_bd_pins axi_smc/aresetn] \
-  [get_bd_pins axi_mem_intercon/S00_ARESETN] \
-  [get_bd_pins axi_mem_intercon/M00_ARESETN] \
-  [get_bd_pins axi_mem_intercon/ARESETN]
+  [get_bd_pins axi_bram_b/s_axi_aresetn] \
+  [get_bd_pins axi_bram_c/s_axi_aresetn] \
+  [get_bd_pins axi_gpio_0/s_axi_aresetn]
+  connect_bd_net -net rst_ps7_0_100M_peripheral_reset  [get_bd_pins rst_ps7_0_100M/peripheral_reset] \
+  [get_bd_pins ntt_top_0/ap_rst]
+  connect_bd_net -net xlconcat_0_dout  [get_bd_pins xlconcat_ap/dout] \
+  [get_bd_pins axi_gpio_0/gpio2_io_i]
+  connect_bd_net -net xlconcat_1_dout  [get_bd_pins xlconcat_a/dout] \
+  [get_bd_pins bram_a/web]
+  connect_bd_net -net xlconcat_b_dout  [get_bd_pins xlconcat_b/dout] \
+  [get_bd_pins bram_b/web]
+  connect_bd_net -net xlconcat_c_dout  [get_bd_pins xlconcat_c/dout] \
+  [get_bd_pins bram_c/web]
+  connect_bd_net -net xlconstant_bram_rtsb_dout  [get_bd_pins xlconstant_bram_rtsb/dout] \
+  [get_bd_pins bram_a/rstb] \
+  [get_bd_pins bram_b/rstb] \
+  [get_bd_pins bram_c/rstb]
 
   # Create address segments
-  assign_bd_address -offset 0x40000000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs ntt_top_0/s_axi_CTRL/Reg] -force
-  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces ntt_top_0/Data_m_axi_MAXI] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x40000000 -range 0x00002000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_bram_a/S_AXI/Mem0] -force
+  assign_bd_address -offset 0x40002000 -range 0x00002000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_bram_b/S_AXI/Mem0] -force
+  assign_bd_address -offset 0x40004000 -range 0x00002000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_bram_c/S_AXI/Mem0] -force
+  assign_bd_address -offset 0x40010000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_gpio_0/S_AXI/Reg] -force
 
 
   # Restore current instance
