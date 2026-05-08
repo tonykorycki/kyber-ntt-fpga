@@ -18,13 +18,10 @@
 #include "mul_ntt.h"
 
 void ntt_top(coef_t a[N], coef_t b[N], coef_t c[N]) {
-#pragma HLS INTERFACE s_axilite port=return bundle=CTRL
-#pragma HLS INTERFACE m_axi port=a bundle=MAXI depth=256 offset=slave
-#pragma HLS INTERFACE m_axi port=b bundle=MAXI depth=256 offset=slave
-#pragma HLS INTERFACE m_axi port=c bundle=MAXI depth=256 offset=slave
-#pragma HLS INTERFACE s_axilite port=a bundle=CTRL
-#pragma HLS INTERFACE s_axilite port=b bundle=CTRL
-#pragma HLS INTERFACE s_axilite port=c bundle=CTRL
+#pragma HLS INTERFACE ap_ctrl_hs port=return
+#pragma HLS INTERFACE ap_memory port=a storage_type=ram_1p
+#pragma HLS INTERFACE ap_memory port=b storage_type=ram_1p
+#pragma HLS INTERFACE ap_memory port=c storage_type=ram_1p
 
     ntt_engine(a, false);
     ntt_engine(b, false);

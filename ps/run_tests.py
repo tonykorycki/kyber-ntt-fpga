@@ -38,9 +38,19 @@ for idx, (a, b, expected) in enumerate(vectors):
         continue
     got = list(map(int, r.stdout.split()))
     latency = r.stderr.strip()
+    if len(got) != N:
+        print(f'vector {idx}: driver error — expected {N} values, got {len(got)}')
+        print(f'  stdout: {r.stdout[:120]!r}')
+        print(f'  stderr: {r.stderr[:120]!r}')
+        continue
     mismatches = sum(g % Q != e % Q for g, e in zip(got, expected))
     status = 'PASS' if mismatches == 0 else f'FAIL ({mismatches} mismatches)'
     print(f'vector {idx}: {status}  {latency}')
+    if mismatches > 0:
+        pairs = [(g % Q, e % Q) for g, e in zip(got, expected) if g % Q != e % Q][:5]
+        print(f'  first mismatches (got, expected): {pairs}')
+        print(f'  got[0..4]:      {[g % Q for g in got[:5]]}')
+        print(f'  expected[0..4]: {[e % Q for e in expected[:5]]}')
     if mismatches == 0:
         passed += 1
 
