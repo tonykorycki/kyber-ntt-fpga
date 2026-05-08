@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Thu May  7 16:06:50 2026" VIVADOVERSION="2025.1">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri May  8 00:28:58 2026" VIVADOVERSION="2025.1">
 
   <SYSTEMINFO ARCH="zynq" DEVICE="7z020" NAME="ntt_bd" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -329,7 +329,7 @@
         <PARAMETER NAME="C_MEMORY_DEPTH" VALUE="2048"/>
         <PARAMETER NAME="C_RD_CMD_OPTIMIZATION" VALUE="0"/>
         <PARAMETER NAME="C_READ_LATENCY" VALUE="1"/>
-        <PARAMETER NAME="C_SINGLE_PORT_BRAM" VALUE="0"/>
+        <PARAMETER NAME="C_SINGLE_PORT_BRAM" VALUE="1"/>
         <PARAMETER NAME="C_S_AXI_ADDR_WIDTH" VALUE="13"/>
         <PARAMETER NAME="C_S_AXI_CTRL_ADDR_WIDTH" VALUE="32"/>
         <PARAMETER NAME="C_S_AXI_CTRL_DATA_WIDTH" VALUE="32"/>
@@ -348,7 +348,7 @@
         <PARAMETER NAME="PROTOCOL" VALUE="AXI4"/>
         <PARAMETER NAME="RD_CMD_OPTIMIZATION" VALUE="0"/>
         <PARAMETER NAME="READ_LATENCY" VALUE="1"/>
-        <PARAMETER NAME="SINGLE_PORT_BRAM" VALUE="0"/>
+        <PARAMETER NAME="SINGLE_PORT_BRAM" VALUE="1"/>
         <PARAMETER NAME="SUPPORTS_NARROW_BURST" VALUE="0"/>
         <PARAMETER NAME="USE_ECC" VALUE="0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
@@ -362,43 +362,36 @@
             <CONNECTION INSTANCE="bram_a" PORT="addra"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" LEFT="12" NAME="bram_addr_b" RIGHT="0" SIGIS="undef"/>
         <PORT DIR="O" NAME="bram_clk_a" SIGIS="clk" SIGNAME="axi_bram_a_bram_clk_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_a" PORT="clka"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="bram_clk_b" SIGIS="clk"/>
         <PORT DIR="O" NAME="bram_en_a" SIGIS="undef" SIGNAME="axi_bram_a_bram_en_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_a" PORT="ena"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="bram_en_b" SIGIS="undef"/>
         <PORT DIR="I" LEFT="31" NAME="bram_rddata_a" RIGHT="0" SIGIS="undef" SIGNAME="axi_bram_a_bram_rddata_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_a" PORT="douta"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="31" NAME="bram_rddata_b" RIGHT="0" SIGIS="undef"/>
         <PORT DIR="O" NAME="bram_rst_a" SIGIS="rst" SIGNAME="axi_bram_a_bram_rst_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_a" PORT="rsta"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="bram_rst_b" SIGIS="rst"/>
         <PORT DIR="O" LEFT="3" NAME="bram_we_a" RIGHT="0" SIGIS="undef" SIGNAME="axi_bram_a_bram_we_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_a" PORT="wea"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" LEFT="3" NAME="bram_we_b" RIGHT="0" SIGIS="undef"/>
         <PORT DIR="O" LEFT="31" NAME="bram_wrdata_a" RIGHT="0" SIGIS="undef" SIGNAME="axi_bram_a_bram_wrdata_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_a" PORT="dina"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" LEFT="31" NAME="bram_wrdata_b" RIGHT="0" SIGIS="undef"/>
         <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="processing_system7_0_FCLK_CLK0">
           <CONNECTIONS>
             <CONNECTION INSTANCE="processing_system7_0" PORT="FCLK_CLK0"/>
@@ -639,7 +632,7 @@
           <PARAMETER NAME="MEM_SIZE" VALUE="8192"/>
           <PARAMETER NAME="MEM_WIDTH" VALUE="32"/>
           <PARAMETER NAME="READ_LATENCY" VALUE="1"/>
-          <PARAMETER NAME="READ_WRITE_MODE" VALUE="WRITE_ONLY"/>
+          <PARAMETER NAME="READ_WRITE_MODE" VALUE="READ_WRITE"/>
           <PORTMAPS>
             <PORTMAP LOGICAL="ADDR" PHYSICAL="bram_addr_a"/>
             <PORTMAP LOGICAL="CLK" PHYSICAL="bram_clk_a"/>
@@ -648,23 +641,6 @@
             <PORTMAP LOGICAL="EN" PHYSICAL="bram_en_a"/>
             <PORTMAP LOGICAL="RST" PHYSICAL="bram_rst_a"/>
             <PORTMAP LOGICAL="WE" PHYSICAL="bram_we_a"/>
-          </PORTMAPS>
-        </BUSINTERFACE>
-        <BUSINTERFACE BUSNAME="__NOC__" NAME="BRAM_PORTB" TYPE="INITIATOR" VLNV="xilinx.com:interface:bram:1.0">
-          <PARAMETER NAME="MASTER_TYPE" VALUE="BRAM_CTRL"/>
-          <PARAMETER NAME="MEM_ECC" VALUE="NONE"/>
-          <PARAMETER NAME="MEM_SIZE" VALUE="8192"/>
-          <PARAMETER NAME="MEM_WIDTH" VALUE="32"/>
-          <PARAMETER NAME="READ_LATENCY" VALUE="1"/>
-          <PARAMETER NAME="READ_WRITE_MODE" VALUE="READ_ONLY"/>
-          <PORTMAPS>
-            <PORTMAP LOGICAL="ADDR" PHYSICAL="bram_addr_b"/>
-            <PORTMAP LOGICAL="CLK" PHYSICAL="bram_clk_b"/>
-            <PORTMAP LOGICAL="DIN" PHYSICAL="bram_wrdata_b"/>
-            <PORTMAP LOGICAL="DOUT" PHYSICAL="bram_rddata_b"/>
-            <PORTMAP LOGICAL="EN" PHYSICAL="bram_en_b"/>
-            <PORTMAP LOGICAL="RST" PHYSICAL="bram_rst_b"/>
-            <PORTMAP LOGICAL="WE" PHYSICAL="bram_we_b"/>
           </PORTMAPS>
         </BUSINTERFACE>
       </BUSINTERFACES>
@@ -990,7 +966,7 @@
         <PARAMETER NAME="C_MEMORY_DEPTH" VALUE="2048"/>
         <PARAMETER NAME="C_RD_CMD_OPTIMIZATION" VALUE="0"/>
         <PARAMETER NAME="C_READ_LATENCY" VALUE="1"/>
-        <PARAMETER NAME="C_SINGLE_PORT_BRAM" VALUE="0"/>
+        <PARAMETER NAME="C_SINGLE_PORT_BRAM" VALUE="1"/>
         <PARAMETER NAME="C_S_AXI_ADDR_WIDTH" VALUE="13"/>
         <PARAMETER NAME="C_S_AXI_CTRL_ADDR_WIDTH" VALUE="32"/>
         <PARAMETER NAME="C_S_AXI_CTRL_DATA_WIDTH" VALUE="32"/>
@@ -1009,7 +985,7 @@
         <PARAMETER NAME="PROTOCOL" VALUE="AXI4"/>
         <PARAMETER NAME="RD_CMD_OPTIMIZATION" VALUE="0"/>
         <PARAMETER NAME="READ_LATENCY" VALUE="1"/>
-        <PARAMETER NAME="SINGLE_PORT_BRAM" VALUE="0"/>
+        <PARAMETER NAME="SINGLE_PORT_BRAM" VALUE="1"/>
         <PARAMETER NAME="SUPPORTS_NARROW_BURST" VALUE="0"/>
         <PARAMETER NAME="USE_ECC" VALUE="0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
@@ -1023,43 +999,36 @@
             <CONNECTION INSTANCE="bram_b" PORT="addra"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" LEFT="12" NAME="bram_addr_b" RIGHT="0" SIGIS="undef"/>
         <PORT DIR="O" NAME="bram_clk_a" SIGIS="clk" SIGNAME="axi_bram_b_bram_clk_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_b" PORT="clka"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="bram_clk_b" SIGIS="clk"/>
         <PORT DIR="O" NAME="bram_en_a" SIGIS="undef" SIGNAME="axi_bram_b_bram_en_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_b" PORT="ena"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="bram_en_b" SIGIS="undef"/>
         <PORT DIR="I" LEFT="31" NAME="bram_rddata_a" RIGHT="0" SIGIS="undef" SIGNAME="axi_bram_b_bram_rddata_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_b" PORT="douta"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="31" NAME="bram_rddata_b" RIGHT="0" SIGIS="undef"/>
         <PORT DIR="O" NAME="bram_rst_a" SIGIS="rst" SIGNAME="axi_bram_b_bram_rst_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_b" PORT="rsta"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="bram_rst_b" SIGIS="rst"/>
         <PORT DIR="O" LEFT="3" NAME="bram_we_a" RIGHT="0" SIGIS="undef" SIGNAME="axi_bram_b_bram_we_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_b" PORT="wea"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" LEFT="3" NAME="bram_we_b" RIGHT="0" SIGIS="undef"/>
         <PORT DIR="O" LEFT="31" NAME="bram_wrdata_a" RIGHT="0" SIGIS="undef" SIGNAME="axi_bram_b_bram_wrdata_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_b" PORT="dina"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" LEFT="31" NAME="bram_wrdata_b" RIGHT="0" SIGIS="undef"/>
         <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="processing_system7_0_FCLK_CLK0">
           <CONNECTIONS>
             <CONNECTION INSTANCE="processing_system7_0" PORT="FCLK_CLK0"/>
@@ -1300,7 +1269,7 @@
           <PARAMETER NAME="MEM_SIZE" VALUE="8192"/>
           <PARAMETER NAME="MEM_WIDTH" VALUE="32"/>
           <PARAMETER NAME="READ_LATENCY" VALUE="1"/>
-          <PARAMETER NAME="READ_WRITE_MODE" VALUE="WRITE_ONLY"/>
+          <PARAMETER NAME="READ_WRITE_MODE" VALUE="READ_WRITE"/>
           <PORTMAPS>
             <PORTMAP LOGICAL="ADDR" PHYSICAL="bram_addr_a"/>
             <PORTMAP LOGICAL="CLK" PHYSICAL="bram_clk_a"/>
@@ -1309,23 +1278,6 @@
             <PORTMAP LOGICAL="EN" PHYSICAL="bram_en_a"/>
             <PORTMAP LOGICAL="RST" PHYSICAL="bram_rst_a"/>
             <PORTMAP LOGICAL="WE" PHYSICAL="bram_we_a"/>
-          </PORTMAPS>
-        </BUSINTERFACE>
-        <BUSINTERFACE BUSNAME="__NOC__" NAME="BRAM_PORTB" TYPE="INITIATOR" VLNV="xilinx.com:interface:bram:1.0">
-          <PARAMETER NAME="MASTER_TYPE" VALUE="BRAM_CTRL"/>
-          <PARAMETER NAME="MEM_ECC" VALUE="NONE"/>
-          <PARAMETER NAME="MEM_SIZE" VALUE="8192"/>
-          <PARAMETER NAME="MEM_WIDTH" VALUE="32"/>
-          <PARAMETER NAME="READ_LATENCY" VALUE="1"/>
-          <PARAMETER NAME="READ_WRITE_MODE" VALUE="READ_ONLY"/>
-          <PORTMAPS>
-            <PORTMAP LOGICAL="ADDR" PHYSICAL="bram_addr_b"/>
-            <PORTMAP LOGICAL="CLK" PHYSICAL="bram_clk_b"/>
-            <PORTMAP LOGICAL="DIN" PHYSICAL="bram_wrdata_b"/>
-            <PORTMAP LOGICAL="DOUT" PHYSICAL="bram_rddata_b"/>
-            <PORTMAP LOGICAL="EN" PHYSICAL="bram_en_b"/>
-            <PORTMAP LOGICAL="RST" PHYSICAL="bram_rst_b"/>
-            <PORTMAP LOGICAL="WE" PHYSICAL="bram_we_b"/>
           </PORTMAPS>
         </BUSINTERFACE>
       </BUSINTERFACES>
@@ -1651,7 +1603,7 @@
         <PARAMETER NAME="C_MEMORY_DEPTH" VALUE="2048"/>
         <PARAMETER NAME="C_RD_CMD_OPTIMIZATION" VALUE="0"/>
         <PARAMETER NAME="C_READ_LATENCY" VALUE="1"/>
-        <PARAMETER NAME="C_SINGLE_PORT_BRAM" VALUE="0"/>
+        <PARAMETER NAME="C_SINGLE_PORT_BRAM" VALUE="1"/>
         <PARAMETER NAME="C_S_AXI_ADDR_WIDTH" VALUE="13"/>
         <PARAMETER NAME="C_S_AXI_CTRL_ADDR_WIDTH" VALUE="32"/>
         <PARAMETER NAME="C_S_AXI_CTRL_DATA_WIDTH" VALUE="32"/>
@@ -1670,7 +1622,7 @@
         <PARAMETER NAME="PROTOCOL" VALUE="AXI4"/>
         <PARAMETER NAME="RD_CMD_OPTIMIZATION" VALUE="0"/>
         <PARAMETER NAME="READ_LATENCY" VALUE="1"/>
-        <PARAMETER NAME="SINGLE_PORT_BRAM" VALUE="0"/>
+        <PARAMETER NAME="SINGLE_PORT_BRAM" VALUE="1"/>
         <PARAMETER NAME="SUPPORTS_NARROW_BURST" VALUE="0"/>
         <PARAMETER NAME="USE_ECC" VALUE="0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
@@ -1684,43 +1636,36 @@
             <CONNECTION INSTANCE="bram_c" PORT="addra"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" LEFT="12" NAME="bram_addr_b" RIGHT="0" SIGIS="undef"/>
         <PORT DIR="O" NAME="bram_clk_a" SIGIS="clk" SIGNAME="axi_bram_c_bram_clk_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_c" PORT="clka"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="bram_clk_b" SIGIS="clk"/>
         <PORT DIR="O" NAME="bram_en_a" SIGIS="undef" SIGNAME="axi_bram_c_bram_en_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_c" PORT="ena"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="bram_en_b" SIGIS="undef"/>
         <PORT DIR="I" LEFT="31" NAME="bram_rddata_a" RIGHT="0" SIGIS="undef" SIGNAME="axi_bram_c_bram_rddata_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_c" PORT="douta"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="31" NAME="bram_rddata_b" RIGHT="0" SIGIS="undef"/>
         <PORT DIR="O" NAME="bram_rst_a" SIGIS="rst" SIGNAME="axi_bram_c_bram_rst_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_c" PORT="rsta"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="bram_rst_b" SIGIS="rst"/>
         <PORT DIR="O" LEFT="3" NAME="bram_we_a" RIGHT="0" SIGIS="undef" SIGNAME="axi_bram_c_bram_we_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_c" PORT="wea"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" LEFT="3" NAME="bram_we_b" RIGHT="0" SIGIS="undef"/>
         <PORT DIR="O" LEFT="31" NAME="bram_wrdata_a" RIGHT="0" SIGIS="undef" SIGNAME="axi_bram_c_bram_wrdata_a">
           <CONNECTIONS>
             <CONNECTION INSTANCE="bram_c" PORT="dina"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" LEFT="31" NAME="bram_wrdata_b" RIGHT="0" SIGIS="undef"/>
         <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="processing_system7_0_FCLK_CLK0">
           <CONNECTIONS>
             <CONNECTION INSTANCE="processing_system7_0" PORT="FCLK_CLK0"/>
@@ -1961,7 +1906,7 @@
           <PARAMETER NAME="MEM_SIZE" VALUE="8192"/>
           <PARAMETER NAME="MEM_WIDTH" VALUE="32"/>
           <PARAMETER NAME="READ_LATENCY" VALUE="1"/>
-          <PARAMETER NAME="READ_WRITE_MODE" VALUE="WRITE_ONLY"/>
+          <PARAMETER NAME="READ_WRITE_MODE" VALUE="READ_WRITE"/>
           <PORTMAPS>
             <PORTMAP LOGICAL="ADDR" PHYSICAL="bram_addr_a"/>
             <PORTMAP LOGICAL="CLK" PHYSICAL="bram_clk_a"/>
@@ -1970,23 +1915,6 @@
             <PORTMAP LOGICAL="EN" PHYSICAL="bram_en_a"/>
             <PORTMAP LOGICAL="RST" PHYSICAL="bram_rst_a"/>
             <PORTMAP LOGICAL="WE" PHYSICAL="bram_we_a"/>
-          </PORTMAPS>
-        </BUSINTERFACE>
-        <BUSINTERFACE BUSNAME="__NOC__" NAME="BRAM_PORTB" TYPE="INITIATOR" VLNV="xilinx.com:interface:bram:1.0">
-          <PARAMETER NAME="MASTER_TYPE" VALUE="BRAM_CTRL"/>
-          <PARAMETER NAME="MEM_ECC" VALUE="NONE"/>
-          <PARAMETER NAME="MEM_SIZE" VALUE="8192"/>
-          <PARAMETER NAME="MEM_WIDTH" VALUE="32"/>
-          <PARAMETER NAME="READ_LATENCY" VALUE="1"/>
-          <PARAMETER NAME="READ_WRITE_MODE" VALUE="READ_ONLY"/>
-          <PORTMAPS>
-            <PORTMAP LOGICAL="ADDR" PHYSICAL="bram_addr_b"/>
-            <PORTMAP LOGICAL="CLK" PHYSICAL="bram_clk_b"/>
-            <PORTMAP LOGICAL="DIN" PHYSICAL="bram_wrdata_b"/>
-            <PORTMAP LOGICAL="DOUT" PHYSICAL="bram_rddata_b"/>
-            <PORTMAP LOGICAL="EN" PHYSICAL="bram_en_b"/>
-            <PORTMAP LOGICAL="RST" PHYSICAL="bram_rst_b"/>
-            <PORTMAP LOGICAL="WE" PHYSICAL="bram_we_b"/>
           </PORTMAPS>
         </BUSINTERFACE>
       </BUSINTERFACES>
@@ -3610,9 +3538,9 @@
             <CONNECTION INSTANCE="axi_bram_a" PORT="bram_addr_a"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="31" NAME="addrb" RIGHT="0" SIGIS="undef" SIGNAME="ntt_top_0_a_address0">
+        <PORT DIR="I" LEFT="31" NAME="addrb" RIGHT="0" SIGIS="undef" SIGNAME="lshift2_a_dout">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="ntt_top_0" PORT="a_address0"/>
+            <CONNECTION INSTANCE="lshift2_a" PORT="dout"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="clka" SIGIS="clk" SIGNAME="axi_bram_a_bram_clk_a">
@@ -3877,9 +3805,9 @@
             <CONNECTION INSTANCE="axi_bram_b" PORT="bram_addr_a"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="31" NAME="addrb" RIGHT="0" SIGIS="undef" SIGNAME="ntt_top_0_b_address0">
+        <PORT DIR="I" LEFT="31" NAME="addrb" RIGHT="0" SIGIS="undef" SIGNAME="lshift2_b_dout">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="ntt_top_0" PORT="b_address0"/>
+            <CONNECTION INSTANCE="lshift2_b" PORT="dout"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="clka" SIGIS="clk" SIGNAME="axi_bram_b_bram_clk_a">
@@ -4144,9 +4072,9 @@
             <CONNECTION INSTANCE="axi_bram_c" PORT="bram_addr_a"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="31" NAME="addrb" RIGHT="0" SIGIS="undef" SIGNAME="ntt_top_0_c_address0">
+        <PORT DIR="I" LEFT="31" NAME="addrb" RIGHT="0" SIGIS="undef" SIGNAME="lshift2_c_dout">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="ntt_top_0" PORT="c_address0"/>
+            <CONNECTION INSTANCE="lshift2_c" PORT="dout"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="clka" SIGIS="clk" SIGNAME="axi_bram_c_bram_clk_a">
@@ -4251,6 +4179,490 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
     </MODULE>
+    <MODULE COREREVISION="10" FULLNAME="/const00_a" HWVERSION="1.1" INSTANCE="const00_a" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="xlconstant" VLNV="xilinx.com:ip:xlconstant:1.1">
+      <DOCUMENTS/>
+      <PARAMETERS>
+        <PARAMETER NAME="CONST_VAL" VALUE="0x0"/>
+        <PARAMETER NAME="CONST_WIDTH" VALUE="2"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconstant_0_1"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT DIR="O" LEFT="1" NAME="dout" RIGHT="0" SIGIS="undef" SIGNAME="const00_a_dout">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="lshift2_a" PORT="In0"/>
+            <CONNECTION INSTANCE="lshift2_c" PORT="In0"/>
+            <CONNECTION INSTANCE="lshift2_b" PORT="In0"/>
+          </CONNECTIONS>
+        </PORT>
+      </PORTS>
+      <BUSINTERFACES/>
+    </MODULE>
+    <MODULE COREREVISION="7" FULLNAME="/lshift2_a" HWVERSION="2.1" INSTANCE="lshift2_a" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="xlconcat" VLNV="xilinx.com:ip:xlconcat:2.1">
+      <DOCUMENTS/>
+      <PARAMETERS>
+        <PARAMETER NAME="IN0_WIDTH" VALUE="2"/>
+        <PARAMETER NAME="IN100_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN101_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN102_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN103_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN104_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN105_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN106_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN107_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN108_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN109_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN10_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN110_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN111_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN112_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN113_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN114_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN115_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN116_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN117_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN118_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN119_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN11_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN120_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN121_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN122_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN123_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN124_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN125_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN126_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN127_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN12_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN13_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN14_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN15_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN16_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN17_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN18_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN19_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN1_WIDTH" VALUE="8"/>
+        <PARAMETER NAME="IN20_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN21_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN22_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN23_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN24_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN25_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN26_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN27_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN28_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN29_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN2_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN30_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN31_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN32_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN33_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN34_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN35_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN36_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN37_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN38_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN39_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN3_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN40_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN41_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN42_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN43_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN44_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN45_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN46_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN47_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN48_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN49_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN4_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN50_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN51_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN52_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN53_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN54_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN55_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN56_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN57_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN58_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN59_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN5_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN60_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN61_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN62_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN63_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN64_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN65_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN66_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN67_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN68_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN69_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN6_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN70_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN71_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN72_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN73_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN74_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN75_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN76_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN77_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN78_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN79_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN7_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN80_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN81_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN82_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN83_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN84_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN85_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN86_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN87_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN88_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN89_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN8_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN90_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN91_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN92_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN93_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN94_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN95_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN96_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN97_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN98_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN99_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN9_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="NUM_PORTS" VALUE="2"/>
+        <PARAMETER NAME="dout_width" VALUE="10"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconcat_0_1"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT DIR="I" LEFT="1" NAME="In0" RIGHT="0" SIGIS="undef" SIGNAME="const00_a_dout">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="const00_a" PORT="dout"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" LEFT="7" NAME="In1" RIGHT="0" SIGIS="undef" SIGNAME="ntt_top_0_a_address0">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="ntt_top_0" PORT="a_address0"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" LEFT="9" NAME="dout" RIGHT="0" SIGIS="undef" SIGNAME="lshift2_a_dout">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="bram_a" PORT="addrb"/>
+          </CONNECTIONS>
+        </PORT>
+      </PORTS>
+      <BUSINTERFACES/>
+    </MODULE>
+    <MODULE COREREVISION="7" FULLNAME="/lshift2_b" HWVERSION="2.1" INSTANCE="lshift2_b" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="xlconcat" VLNV="xilinx.com:ip:xlconcat:2.1">
+      <DOCUMENTS/>
+      <PARAMETERS>
+        <PARAMETER NAME="IN0_WIDTH" VALUE="2"/>
+        <PARAMETER NAME="IN100_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN101_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN102_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN103_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN104_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN105_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN106_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN107_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN108_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN109_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN10_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN110_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN111_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN112_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN113_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN114_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN115_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN116_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN117_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN118_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN119_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN11_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN120_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN121_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN122_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN123_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN124_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN125_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN126_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN127_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN12_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN13_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN14_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN15_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN16_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN17_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN18_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN19_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN1_WIDTH" VALUE="8"/>
+        <PARAMETER NAME="IN20_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN21_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN22_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN23_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN24_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN25_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN26_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN27_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN28_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN29_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN2_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN30_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN31_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN32_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN33_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN34_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN35_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN36_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN37_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN38_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN39_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN3_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN40_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN41_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN42_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN43_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN44_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN45_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN46_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN47_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN48_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN49_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN4_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN50_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN51_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN52_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN53_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN54_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN55_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN56_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN57_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN58_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN59_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN5_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN60_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN61_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN62_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN63_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN64_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN65_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN66_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN67_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN68_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN69_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN6_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN70_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN71_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN72_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN73_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN74_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN75_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN76_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN77_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN78_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN79_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN7_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN80_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN81_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN82_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN83_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN84_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN85_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN86_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN87_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN88_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN89_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN8_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN90_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN91_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN92_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN93_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN94_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN95_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN96_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN97_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN98_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN99_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN9_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="NUM_PORTS" VALUE="2"/>
+        <PARAMETER NAME="dout_width" VALUE="10"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_lshift2_a_1"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT DIR="I" LEFT="1" NAME="In0" RIGHT="0" SIGIS="undef" SIGNAME="const00_a_dout">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="const00_a" PORT="dout"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" LEFT="7" NAME="In1" RIGHT="0" SIGIS="undef" SIGNAME="ntt_top_0_b_address0">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="ntt_top_0" PORT="b_address0"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" LEFT="9" NAME="dout" RIGHT="0" SIGIS="undef" SIGNAME="lshift2_b_dout">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="bram_b" PORT="addrb"/>
+          </CONNECTIONS>
+        </PORT>
+      </PORTS>
+      <BUSINTERFACES/>
+    </MODULE>
+    <MODULE COREREVISION="7" FULLNAME="/lshift2_c" HWVERSION="2.1" INSTANCE="lshift2_c" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="xlconcat" VLNV="xilinx.com:ip:xlconcat:2.1">
+      <DOCUMENTS/>
+      <PARAMETERS>
+        <PARAMETER NAME="IN0_WIDTH" VALUE="2"/>
+        <PARAMETER NAME="IN100_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN101_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN102_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN103_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN104_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN105_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN106_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN107_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN108_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN109_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN10_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN110_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN111_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN112_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN113_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN114_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN115_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN116_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN117_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN118_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN119_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN11_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN120_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN121_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN122_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN123_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN124_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN125_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN126_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN127_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN12_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN13_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN14_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN15_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN16_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN17_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN18_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN19_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN1_WIDTH" VALUE="8"/>
+        <PARAMETER NAME="IN20_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN21_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN22_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN23_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN24_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN25_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN26_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN27_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN28_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN29_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN2_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN30_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN31_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN32_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN33_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN34_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN35_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN36_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN37_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN38_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN39_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN3_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN40_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN41_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN42_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN43_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN44_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN45_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN46_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN47_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN48_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN49_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN4_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN50_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN51_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN52_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN53_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN54_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN55_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN56_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN57_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN58_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN59_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN5_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN60_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN61_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN62_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN63_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN64_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN65_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN66_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN67_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN68_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN69_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN6_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN70_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN71_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN72_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN73_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN74_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN75_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN76_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN77_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN78_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN79_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN7_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN80_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN81_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN82_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN83_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN84_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN85_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN86_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN87_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN88_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN89_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN8_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN90_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN91_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN92_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN93_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN94_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN95_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN96_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN97_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN98_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN99_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="IN9_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="NUM_PORTS" VALUE="2"/>
+        <PARAMETER NAME="dout_width" VALUE="10"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_lshift2_a_0"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT DIR="I" LEFT="1" NAME="In0" RIGHT="0" SIGIS="undef" SIGNAME="const00_a_dout">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="const00_a" PORT="dout"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" LEFT="7" NAME="In1" RIGHT="0" SIGIS="undef" SIGNAME="ntt_top_0_c_address0">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="ntt_top_0" PORT="c_address0"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" LEFT="9" NAME="dout" RIGHT="0" SIGIS="undef" SIGNAME="lshift2_c_dout">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="bram_c" PORT="addrb"/>
+          </CONNECTIONS>
+        </PORT>
+      </PORTS>
+      <BUSINTERFACES/>
+    </MODULE>
     <MODULE COREREVISION="2114598331" FULLNAME="/ntt_top_0" HWVERSION="1.0" INSTANCE="ntt_top_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="ntt_top" VLNV="xilinx.com:hls:ntt_top:1.0">
       <DOCUMENTS/>
       <PARAMETERS>
@@ -4265,7 +4677,7 @@
       <PORTS>
         <PORT DIR="O" LEFT="7" NAME="a_address0" RIGHT="0" SIGIS="data" SIGNAME="ntt_top_0_a_address0">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="bram_a" PORT="addrb"/>
+            <CONNECTION INSTANCE="lshift2_a" PORT="In1"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="a_ce0" SIGIS="undef" SIGNAME="ntt_top_0_a_ce0">
@@ -4319,7 +4731,7 @@
         </PORT>
         <PORT DIR="O" LEFT="7" NAME="b_address0" RIGHT="0" SIGIS="data" SIGNAME="ntt_top_0_b_address0">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="bram_b" PORT="addrb"/>
+            <CONNECTION INSTANCE="lshift2_b" PORT="In1"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="b_ce0" SIGIS="undef" SIGNAME="ntt_top_0_b_ce0">
@@ -4347,7 +4759,7 @@
         </PORT>
         <PORT DIR="O" LEFT="7" NAME="c_address0" RIGHT="0" SIGIS="data" SIGNAME="ntt_top_0_c_address0">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="bram_c" PORT="addrb"/>
+            <CONNECTION INSTANCE="lshift2_c" PORT="In1"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="c_ce0" SIGIS="undef" SIGNAME="ntt_top_0_c_ce0">
