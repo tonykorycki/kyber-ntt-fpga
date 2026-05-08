@@ -54,13 +54,25 @@ static long ntt_mul(uint16_t *a, uint16_t *b, uint16_t *c)
 {
     struct timespec t0, t1;
 
+    for (int i = 0; i < N; i++) bram_c[i] = 0;
     for (int i = 0; i < N; i++) bram_a[i] = (uint32_t)a[i];
     for (int i = 0; i < N; i++) bram_b[i] = (uint32_t)b[i];
 
     clock_gettime(CLOCK_MONOTONIC, &t0);
     gwrite(GPIO_CH1_DATA, 1);
     gwrite(GPIO_CH1_DATA, 0);
-    while (!(gread(GPIO_CH2_DATA) & 0x1))
+
+    /* ap_done is a single-cycle pulse (10 ns) — too narrow to catch by polling.
+     * Poll ap_idle (bit 1) instead: it deasserts when HLS starts and reasserts
+     * when done, making it a sustained, race-free completion signal. */
+    int timeout = 100000;
+    while ((gread(GPIO_CH2_DATA) & 0x2) && --timeout > 0)
+        ;
+    if (timeout == 0) {
+        fprintf(stderr, "ERROR: ap_idle never deasserted — HLS did not start\n");
+        return -1;
+    }
+    while (!(gread(GPIO_CH2_DATA) & 0x2))
         ;
     clock_gettime(CLOCK_MONOTONIC, &t1);
 
@@ -115,9 +127,11 @@ int main(int argc, char *argv[])
         while (fread(a, sizeof(uint16_t), N, stdin) == (size_t)N) {
             if (fread(b, sizeof(uint16_t), N, stdin) != (size_t)N) break;
             for (int i = 0; i < N; i++) { a[i] %= Q; b[i] %= Q; }
-            ntt_mul(a, b, c);
+            long ns = ntt_mul(a, b, c);
             for (int i = 0; i < N; i++) c[i] %= Q;
             fwrite(c, sizeof(uint16_t), N, stdout);
+            int64_t ns64 = (int64_t)ns;
+            fwrite(&ns64, sizeof(int64_t), 1, stdout);
             fflush(stdout);
         }
 
