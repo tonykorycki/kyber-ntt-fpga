@@ -7,6 +7,9 @@ via Vivado block design, and deployed on a PYNQ-Z2 (Zynq-7000 SoC).
 The full Kyber KEM protocol runs on the ARM PS; every polynomial multiply is offloaded to the PL
 via memory-mapped BRAM. No OS drivers, no DMA — just `/dev/mem` and a C binary.
 
+**[Live demo notebook →](ps/kyber_demo.ipynb)** — benchmarks, correctness proofs, and a
+complete hardware-accelerated Kyber-512 key exchange with charts.
+
 ---
 
 ## Results
@@ -14,7 +17,8 @@ via memory-mapped BRAM. No OS drivers, no DMA — just `/dev/mem` and a C binary
 | Metric | Value |
 |---|---|
 | End-to-end compute (NTT(a) ∥ NTT(b) → mul → INTT) | **7,639–8,687 cycles** |
-| Latency @ 100 MHz | **~76–87 µs** |
+| Latency @ 100 MHz (measured, ap_start → ap_idle) | **~133 µs** |
+| Per-multiply speedup vs ARM Cortex-A9 Python | **~400×** |
 | Timing closure (WNS) | 0.097 ns @ 100 MHz |
 | LUT utilization | 7,552 / 53,200 (14%) |
 | FF utilization | 7,858 / 106,400 (7%) |
@@ -28,6 +32,8 @@ HLS auto-parallelizes NTT(a) and NTT(b) into two hardware instances, so total la
 ---
 
 ## Architecture
+
+![Vivado block design](docs/images/block_design.png)
 
 ```
 PS (ARM Cortex-A9, Linux)          PL (FPGA Fabric)
