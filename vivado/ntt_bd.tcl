@@ -260,6 +260,8 @@ proc create_root_design { parentCell } {
 
   # Create instance: axi_bram_a, and set properties
   set axi_bram_a [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.1 axi_bram_a ]
+  set_property CONFIG.SINGLE_PORT_BRAM {1} $axi_bram_a
+
 
   # Create instance: bram_c, and set properties
   set bram_c [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.4 bram_c ]
@@ -289,9 +291,13 @@ proc create_root_design { parentCell } {
 
   # Create instance: axi_bram_c, and set properties
   set axi_bram_c [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.1 axi_bram_c ]
+  set_property CONFIG.SINGLE_PORT_BRAM {1} $axi_bram_c
+
 
   # Create instance: axi_bram_b, and set properties
   set axi_bram_b [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.1 axi_bram_b ]
+  set_property CONFIG.SINGLE_PORT_BRAM {1} $axi_bram_b
+
 
   # Create instance: axi_gpio_0, and set properties
   set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_0 ]
@@ -338,6 +344,41 @@ proc create_root_design { parentCell } {
   set_property CONFIG.CONST_VAL {0} $xlconstant_bram_rtsb
 
 
+  # Create instance: const00_a, and set properties
+  set const00_a [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 const00_a ]
+  set_property -dict [list \
+    CONFIG.CONST_VAL {0} \
+    CONFIG.CONST_WIDTH {2} \
+  ] $const00_a
+
+
+  # Create instance: lshift2_a, and set properties
+  set lshift2_a [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 lshift2_a ]
+  set_property -dict [list \
+    CONFIG.IN0_WIDTH {2} \
+    CONFIG.IN1_WIDTH {8} \
+    CONFIG.NUM_PORTS {2} \
+  ] $lshift2_a
+
+
+  # Create instance: lshift2_b, and set properties
+  set lshift2_b [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 lshift2_b ]
+  set_property -dict [list \
+    CONFIG.IN0_WIDTH {2} \
+    CONFIG.IN1_WIDTH {8} \
+    CONFIG.NUM_PORTS {2} \
+  ] $lshift2_b
+
+
+  # Create instance: lshift2_c, and set properties
+  set lshift2_c [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 lshift2_c ]
+  set_property -dict [list \
+    CONFIG.IN0_WIDTH {2} \
+    CONFIG.IN1_WIDTH {8} \
+    CONFIG.NUM_PORTS {2} \
+  ] $lshift2_c
+
+
   # Create interface connections
   connect_bd_intf_net -intf_net axi_bram_a_BRAM_PORTA [get_bd_intf_pins axi_bram_a/BRAM_PORTA] [get_bd_intf_pins bram_a/BRAM_PORTA]
   connect_bd_intf_net -intf_net axi_bram_b_BRAM_PORTA [get_bd_intf_pins axi_bram_b/BRAM_PORTA] [get_bd_intf_pins bram_b/BRAM_PORTA]
@@ -367,8 +408,18 @@ proc create_root_design { parentCell } {
   [get_bd_pins ntt_top_0/b_q0]
   connect_bd_net -net bram_c_doutb  [get_bd_pins bram_c/doutb] \
   [get_bd_pins ntt_top_0/c_q0]
-  connect_bd_net -net ntt_top_0_a_address0  [get_bd_pins ntt_top_0/a_address0] \
+  connect_bd_net -net const00_a_dout  [get_bd_pins const00_a/dout] \
+  [get_bd_pins lshift2_a/In0] \
+  [get_bd_pins lshift2_b/In0] \
+  [get_bd_pins lshift2_c/In0]
+  connect_bd_net -net lshift2_a_dout  [get_bd_pins lshift2_a/dout] \
   [get_bd_pins bram_a/addrb]
+  connect_bd_net -net lshift2_b_dout  [get_bd_pins lshift2_b/dout] \
+  [get_bd_pins bram_b/addrb]
+  connect_bd_net -net lshift2_c_dout  [get_bd_pins lshift2_c/dout] \
+  [get_bd_pins bram_c/addrb]
+  connect_bd_net -net ntt_top_0_a_address0  [get_bd_pins ntt_top_0/a_address0] \
+  [get_bd_pins lshift2_a/In1]
   connect_bd_net -net ntt_top_0_a_ce0  [get_bd_pins ntt_top_0/a_ce0] \
   [get_bd_pins bram_a/enb]
   connect_bd_net -net ntt_top_0_a_d0  [get_bd_pins ntt_top_0/a_d0] \
@@ -383,13 +434,13 @@ proc create_root_design { parentCell } {
   connect_bd_net -net ntt_top_0_ap_idle  [get_bd_pins ntt_top_0/ap_idle] \
   [get_bd_pins xlconcat_ap/In1]
   connect_bd_net -net ntt_top_0_b_address0  [get_bd_pins ntt_top_0/b_address0] \
-  [get_bd_pins bram_b/addrb]
+  [get_bd_pins lshift2_b/In1]
   connect_bd_net -net ntt_top_0_b_ce0  [get_bd_pins ntt_top_0/b_ce0] \
   [get_bd_pins bram_b/enb]
   connect_bd_net -net ntt_top_0_b_d0  [get_bd_pins ntt_top_0/b_d0] \
   [get_bd_pins bram_b/dinb]
   connect_bd_net -net ntt_top_0_c_address0  [get_bd_pins ntt_top_0/c_address0] \
-  [get_bd_pins bram_c/addrb]
+  [get_bd_pins lshift2_c/In1]
   connect_bd_net -net ntt_top_0_c_ce0  [get_bd_pins ntt_top_0/c_ce0] \
   [get_bd_pins bram_c/enb]
   connect_bd_net -net ntt_top_0_c_d0  [get_bd_pins ntt_top_0/c_d0] \
