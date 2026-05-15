@@ -70,11 +70,15 @@ if {[get_property PROGRESS [get_runs impl_1]] != "100%"} {
     error "Implementation failed — see $proj_dir/ntt_accel.runs/impl_1/runme.log"
 }
 
+# Re-export block design TCLe
+open_bd_design [get_files ntt_bd.bd]
+update_compile_order -fileset sources_1
+write_bd_tcl -force $bd_tcl
+puts "Block design TCL updated: $bd_tcl"
+
 puts ""
 puts "=== Done ==="
 puts "  Bitstream : $proj_dir/ntt_accel.runs/impl_1/ntt_bd_wrapper.bit"
 puts "  HWH       : $proj_dir/ntt_accel.gen/sources_1/bd/ntt_bd/hw_handoff/ntt_bd.hwh"
+puts "  BD TCL    : $bd_tcl"
 puts "  Run 'make export' to copy outputs to bitstream/"
-puts ""
-puts "  To update vivado/ntt_bd.tcl after block design changes, run from Vivado Tcl console:"
-puts "    write_bd_tcl -force $bd_tcl"
