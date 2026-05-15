@@ -38,9 +38,9 @@ void ntt_engine(coef_t a[N], bool inverse) {
 #ifdef NTT_FLAT_PIPELINE
         // Flat forward NTT: counter-based addressing, no barrel shifters.
         int k = 0;
+        int n_blocks = 1;         
         for (int len = N/2; len >= 2; len >>= 1) {
             int k_base   = k;
-            int n_blocks = N / (2*len);
             int lower    = 0;
             int blk      = 0;
             int j_cnt    = 0;
@@ -72,6 +72,7 @@ void ntt_engine(coef_t a[N], bool inverse) {
                 lower = lower_next;
             }
             k += n_blocks;
+            n_blocks <<= 1;
         }
 #else
         // Standard nested-loop forward NTT (FIPS 203 Algorithm 9).
@@ -96,9 +97,9 @@ void ntt_engine(coef_t a[N], bool inverse) {
 #ifdef NTT_FLAT_PIPELINE
         // Flat inverse NTT: counter-based addressing, same structure as forward.
         int k = N/2 - 2;
+        int n_blocks = N/4;        
         for (int len = 2; len <= N/2; len <<= 1) {
             int k_start  = k;
-            int n_blocks = N / (2*len);
             int lower    = 0;
             int blk      = 0;
             int j_cnt    = 0;
@@ -127,6 +128,7 @@ void ntt_engine(coef_t a[N], bool inverse) {
                 lower = lower_next;
             }
             k -= n_blocks;
+            n_blocks >>= 1;
         }
 #else
         // Standard nested-loop inverse NTT (FIPS 203 Algorithm 10).
