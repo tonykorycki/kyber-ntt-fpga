@@ -333,7 +333,95 @@ The pre-twist $\psi^\bullet$ converts the negacyclic ring into the cyclic ring b
 
 ---
 
-## 10. Parameter Instantiation
+
+## 10. The Kyber-Native NTT
+
+Sections 3–9 derive negacyclic multiplication via a pre-twist by $\psi$, a primitive $2N$-th root of unity. For full Kyber parameters ($N=256$, $q=3329$), this root does not exist in $\mathbb{Z}_q$: the multiplicative group has order $q-1 = 3328 = 2^8 \cdot 13$, and a primitive $512$-th root would require $512 = 2^9$ to divide $3328$ — which fails since $2^9 \nmid 2^8 \cdot 13$. The implementation uses a different algorithm that avoids $\psi$ entirely.
+
+### 10.1 Factorisation of $x^N+1$ over $\mathbb{Z}_q$
+
+Because $256 \mid 3328$ (a primitive $256$-th root $\zeta$ exists) but $512 \nmid 3328$, the polynomial $x^{256}+1$ does not split into linear factors over $\mathbb{Z}_q$ but does factor completely into $N/2$ irreducible quadratics:
+
+```math
+x^{256} + 1 \;=\; \prod_{i=0}^{127} (x^2 - \zeta^{2i+1}) \bmod 3329
+```
+
+where $\zeta = 17$ is the primitive $256$-th root specified in FIPS 203.
+
+*Proof.* If $r^2 = \zeta^{2i+1}$ then $r^{256} = (r^2)^{128} = \zeta^{(2i+1) \cdot 128} = \zeta^{128} = -1$ (by property (3)), so every such $r$ is a root of $x^{256}+1$. The $128$ values $\zeta^{2i+1}$ for $i=0,\ldots,127$ are distinct, the quadratics $x^2 - \zeta^{2i+1}$ are pairwise coprime, and their product has degree $256 = \deg(x^{256}+1)$, so the factorisation is exact. Each factor is irreducible over $\mathbb{Z}_q$ because $\zeta^{(2i+1)/2}$ would require a $512$-th root, which does not exist. $\square$
+
+### 10.2 CRT Decomposition and Ring Isomorphism
+
+By the Chinese Remainder Theorem, the factorisation yields a ring isomorphism:
+
+```math
+\mathbb{Z}_q[x]/(x^{256}+1) \;\cong\; \prod_{i=0}^{127} \mathbb{Z}_q[x]/(x^2 - \gamma_i),
+\qquad \gamma_i = \zeta^{2i+1}
+```
+
+Multiplication in $\mathbb{Z}_q[x]/(x^{256}+1)$ decomposes into $128$ independent multiplications in the smaller rings $\mathbb{Z}_q[x]/(x^2-\gamma_i)$. The $7$-stage forward NTT butterfly computes this decomposition; the $7$-stage inverse NTT butterfly computes its inverse.
+
+### 10.3 The Forward NTT Butterfly (FIPS 203 Algorithm 9)
+
+The factorisation is computed hierarchically. The first butterfly stage splits:
+
+```math
+x^{256} + 1 = (x^{128} - \zeta^{64})(x^{128} + \zeta^{64})
+```
+
+using twiddle $\zeta^{64}$, since $(\zeta^{64})^2 = \zeta^{128} = -1$. Each subsequent stage applies a finer split, halving the degree at each level. After $\log_2(N/2) = 7$ stages, the $N=256$ coefficients are partitioned into $N/2=128$ pairs — the CRT components.
+
+**Twiddle schedule.** Let $K = \log_2(N/2) = 7$. The twiddle for butterfly $k$ ($k$ incrementing from $1$ across all groups and stages) is $\zeta^{\mathrm{brv}_K(k)}$, where $\mathrm{brv}_K$ denotes the $K$-bit reversal. In table form:
+
+```math
+\text{TWIDDLE}[k] = \zeta^{\mathrm{brv}_7(k+1)}, \quad k = 0, \ldots, N/2 - 1
+```
+
+The bit-reversed ordering arises from the recursive structure: each split assigns the "left" sub-problem to even-indexed groups and "right" to odd, accumulating index bits LSB-first. Only $127$ of the $128$ entries are consumed per forward NTT ($1+2+4+\cdots+64$ groups across $7$ stages); entry $127$ is padding.
+
+**Algorithm:**
+```
+k ← 1
+for len in 128, 64, 32, 16, 8, 4, 2:
+    for start in 0, 2·len, 4·len, ..., N−1:
+        zeta ← TWIDDLE[k−1];  k ← k + 1
+        for j in 0..len−1:
+            t              ← barrett_mul(zeta, a[start+len+j])
+            a[start+len+j] ← (a[start+j] − t + Q) mod Q
+            a[start+j]     ← (a[start+j] + t)     mod Q
+```
+
+### 10.4 Base-Case Multiplication in $\mathbb{Z}_q[x]/(x^2-\gamma)$ (FIPS 203 Algorithm 11)
+
+After the forward NTT, each pair $(A[2i],\, A[2i+1])$ represents $a_0+a_1 x \in \mathbb{Z}_q[x]/(x^2-\gamma_i)$, where $\gamma_i = \text{SLOT\_ZETA}[i] = \zeta^{2 \cdot \mathrm{brv}_7(i)+1}$. Multiplying two such elements:
+
+```math
+(a_0 + a_1 x)(b_0 + b_1 x) \bmod (x^2 - \gamma) \;=\; (a_0 b_0 + a_1 b_1 \gamma) + (a_0 b_1 + a_1 b_0)\,x
+```
+
+Both output coefficients computed for all $128$ slots is FIPS 203 Algorithm 11:
+
+```
+for i in 0..N/2−1:
+    gamma  ← SLOT_ZETA[i]
+    C[2i]   ← barrett_mul(A[2i], B[2i]) + barrett_mul(barrett_mul(A[2i+1], B[2i+1]), gamma)  (mod Q)
+    C[2i+1] ← barrett_mul(A[2i], B[2i+1]) + barrett_mul(A[2i+1], B[2i])                       (mod Q)
+```
+
+### 10.5 The Inverse NTT (FIPS 203 Algorithm 10)
+
+The inverse NTT reconstructs $c \in \mathbb{Z}_q[x]/(x^N+1)$ from its $128$ CRT residues. The butterfly runs in reverse: stages proceed $\text{len}=2, 4, \ldots, 128$ (Gentleman-Sande), and the TWIDDLE table is traversed in reverse ($k$ counting down from $N/2-2$ to $0$). The scaling factor is $\text{INV\_N} = (N/2)^{-1} \bmod Q$, applied to every coefficient after all stages.
+
+The scaling by $N/2$ (not $N$) reflects that the $7$-stage NTT computes $N/2$ two-point sub-problems, each contributing a factor of $2$.
+
+### 10.6 Relation to Sections 3–9
+
+For parameter sets where a primitive $2N$-th root $\psi$ exists (e.g., $n=4$, $q=17$, where $8 \mid 16$), the two approaches are equivalent: the Kyber-native twiddle schedule absorbs the pre-twist $\psi^i$ into the butterfly twiddles, and the base-case formula in $\mathbb{Z}_q[x]/(x^2-\gamma)$ is the degree-$1$ version of the pointwise multiply that emerges when the NTT fully resolves to scalars.
+
+For $q=3329$, $\psi$ does not exist in $\mathbb{Z}_q$. Section 8 describes the mathematical motivation; this section is the specification of what is actually implemented in `golden/kyber_ntt.py`, `hls/src/ntt_engine.cpp`, and `hls/src/mul_ntt.cpp`.
+
+
+## 11. Parameter Instantiation
 
 ### Toy / development parameters
 
@@ -359,11 +447,13 @@ Verify: $\psi^8 = 9^8 \bmod 17 = 1$ ✓, $\psi^4 = 9^4 \bmod 17 = 16 = -1$ ✓, 
 | $\psi$ (primitive 512th root) | $\sqrt{17} \bmod 3329$ |
 | $n^{-1} \bmod q$ | $3303$ |
 
-Note: Kyber uses a merged twist-NTT representation where the pre-twist and NTT are combined into a single pass using a modified twiddle table. The mathematical content is identical; the implementation fuses steps (15) and (16) for efficiency.
+Note: For q=3329, a primitive 512th root of unity does not exist in Z_q, so ψ and the
+pre-twist of Section 8 are not directly applicable. Section 10 covers the Kyber-native
+algorithm actually implemented.
 
 ---
 
-## 11. Barrett Reduction
+## 12. Barrett Reduction
 
 Every butterfly requires a modular multiplication. For hardware, Barrett reduction avoids division by replacing it with multiplications and shifts. Precompute:
 
