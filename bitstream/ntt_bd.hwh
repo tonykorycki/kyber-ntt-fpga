@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri May  8 00:28:58 2026" VIVADOVERSION="2025.1">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri May 15 17:01:26 2026" VIVADOVERSION="2025.1">
 
   <SYSTEMINFO ARCH="zynq" DEVICE="7z020" NAME="ntt_bd" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -338,7 +338,7 @@
         <PARAMETER NAME="C_S_AXI_PROTOCOL" VALUE="AXI4"/>
         <PARAMETER NAME="C_S_AXI_SUPPORTS_NARROW_BURST" VALUE="0"/>
         <PARAMETER NAME="BMG_INSTANCE" VALUE="EXTERNAL"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_axi_bram_ctrl_0_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_axi_bram_a_0"/>
         <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
         <PARAMETER NAME="ECC_ONOFF_RESET_VALUE" VALUE="0"/>
         <PARAMETER NAME="ECC_TYPE" VALUE="0"/>
@@ -564,7 +564,7 @@
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_1_FCLK_CLK0"/>
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_BRESP" VALUE="1"/>
@@ -975,7 +975,7 @@
         <PARAMETER NAME="C_S_AXI_PROTOCOL" VALUE="AXI4"/>
         <PARAMETER NAME="C_S_AXI_SUPPORTS_NARROW_BURST" VALUE="0"/>
         <PARAMETER NAME="BMG_INSTANCE" VALUE="EXTERNAL"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_axi_bram_a_1"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_axi_bram_b_0"/>
         <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
         <PARAMETER NAME="ECC_ONOFF_RESET_VALUE" VALUE="0"/>
         <PARAMETER NAME="ECC_TYPE" VALUE="0"/>
@@ -1201,7 +1201,7 @@
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_1_FCLK_CLK0"/>
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_BRESP" VALUE="1"/>
@@ -1612,7 +1612,7 @@
         <PARAMETER NAME="C_S_AXI_PROTOCOL" VALUE="AXI4"/>
         <PARAMETER NAME="C_S_AXI_SUPPORTS_NARROW_BURST" VALUE="0"/>
         <PARAMETER NAME="BMG_INSTANCE" VALUE="EXTERNAL"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_axi_bram_a_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_axi_bram_c_0"/>
         <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
         <PARAMETER NAME="ECC_ONOFF_RESET_VALUE" VALUE="0"/>
         <PARAMETER NAME="ECC_TYPE" VALUE="0"/>
@@ -1838,7 +1838,7 @@
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_1_FCLK_CLK0"/>
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_BRESP" VALUE="1"/>
@@ -2226,7 +2226,7 @@
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_1_FCLK_CLK0"/>
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_BRESP" VALUE="1"/>
@@ -2285,15 +2285,15 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
     </MODULE>
-    <MODULE BD="ntt_bd_axi_smc_3" BDTYPE="SBD" COREREVISION="27" DRIVERMODE="CORE" FULLNAME="/axi_smc" HWVERSION="1.0" INSTANCE="axi_smc" IPTYPE="BUS" IS_ENABLE="1" MODCLASS="BUS" MODTYPE="smartconnect" SIM_BD="ntt_bd_axi_smc_3" VLNV="xilinx.com:ip:smartconnect:1.0">
+    <MODULE BD="ntt_bd_axi_smc_0" BDTYPE="SBD" COREREVISION="27" DRIVERMODE="CORE" FULLNAME="/axi_smc" HWVERSION="1.0" INSTANCE="axi_smc" IPTYPE="BUS" IS_ENABLE="1" MODCLASS="BUS" MODTYPE="smartconnect" SIM_BD="ntt_bd_axi_smc_0" VLNV="xilinx.com:ip:smartconnect:1.0">
       <DOCUMENTS>
         <DOCUMENT SOURCE="http://www.xilinx.com/cgi-bin/docs/ipdoc?c=smartconnect;v=v1_0;d=pg247-smartconnect.pdf"/>
       </DOCUMENTS>
       <PARAMETERS>
         <PARAMETER NAME="HAS_RESET" VALUE="1"/>
-        <PARAMETER NAME="TLM_COMPONENT_NAME" VALUE="ntt_bd_axi_smc_3"/>
+        <PARAMETER NAME="TLM_COMPONENT_NAME" VALUE="ntt_bd_axi_smc_0"/>
         <PARAMETER NAME="ADVANCED_PROPERTIES" VALUE="0"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_axi_smc_3"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_axi_smc_0"/>
         <PARAMETER NAME="HAS_ARESETN" VALUE="1"/>
         <PARAMETER NAME="NUM_CLKS" VALUE="1"/>
         <PARAMETER NAME="NUM_MI" VALUE="4"/>
@@ -3058,7 +3058,7 @@
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_1_FCLK_CLK0"/>
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_BRESP" VALUE="1"/>
@@ -3131,7 +3131,7 @@
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_1_FCLK_CLK0"/>
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_BRESP" VALUE="1"/>
@@ -3197,7 +3197,7 @@
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_1_FCLK_CLK0"/>
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_BRESP" VALUE="1"/>
@@ -3263,7 +3263,7 @@
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_1_FCLK_CLK0"/>
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_BRESP" VALUE="1"/>
@@ -3329,7 +3329,7 @@
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_1_FCLK_CLK0"/>
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_BRESP" VALUE="1"/>
@@ -3468,7 +3468,7 @@
         <PARAMETER NAME="CTRL_ECC_ALGO" VALUE="NONE"/>
         <PARAMETER NAME="Coe_File" VALUE="no_coe_file_loaded"/>
         <PARAMETER NAME="Collision_Warnings" VALUE="ALL"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_blk_mem_gen_0_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_bram_a_0"/>
         <PARAMETER NAME="Disable_Collision_Warnings" VALUE="false"/>
         <PARAMETER NAME="Disable_Out_of_Range_Warnings" VALUE="false"/>
         <PARAMETER NAME="ECC" VALUE="false"/>
@@ -3735,7 +3735,7 @@
         <PARAMETER NAME="CTRL_ECC_ALGO" VALUE="NONE"/>
         <PARAMETER NAME="Coe_File" VALUE="no_coe_file_loaded"/>
         <PARAMETER NAME="Collision_Warnings" VALUE="ALL"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_bram_a_1"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_bram_b_0"/>
         <PARAMETER NAME="Disable_Collision_Warnings" VALUE="false"/>
         <PARAMETER NAME="Disable_Out_of_Range_Warnings" VALUE="false"/>
         <PARAMETER NAME="ECC" VALUE="false"/>
@@ -4002,7 +4002,7 @@
         <PARAMETER NAME="CTRL_ECC_ALGO" VALUE="NONE"/>
         <PARAMETER NAME="Coe_File" VALUE="no_coe_file_loaded"/>
         <PARAMETER NAME="Collision_Warnings" VALUE="ALL"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_bram_a_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_bram_c_0"/>
         <PARAMETER NAME="Disable_Collision_Warnings" VALUE="false"/>
         <PARAMETER NAME="Disable_Out_of_Range_Warnings" VALUE="false"/>
         <PARAMETER NAME="ECC" VALUE="false"/>
@@ -4184,15 +4184,15 @@
       <PARAMETERS>
         <PARAMETER NAME="CONST_VAL" VALUE="0x0"/>
         <PARAMETER NAME="CONST_WIDTH" VALUE="2"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconstant_0_1"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_const00_a_0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
         <PORT DIR="O" LEFT="1" NAME="dout" RIGHT="0" SIGIS="undef" SIGNAME="const00_a_dout">
           <CONNECTIONS>
             <CONNECTION INSTANCE="lshift2_a" PORT="In0"/>
-            <CONNECTION INSTANCE="lshift2_c" PORT="In0"/>
             <CONNECTION INSTANCE="lshift2_b" PORT="In0"/>
+            <CONNECTION INSTANCE="lshift2_c" PORT="In0"/>
           </CONNECTIONS>
         </PORT>
       </PORTS>
@@ -4331,7 +4331,7 @@
         <PARAMETER NAME="IN9_WIDTH" VALUE="1"/>
         <PARAMETER NAME="NUM_PORTS" VALUE="2"/>
         <PARAMETER NAME="dout_width" VALUE="10"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconcat_0_1"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_lshift2_a_0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
@@ -4486,7 +4486,7 @@
         <PARAMETER NAME="IN9_WIDTH" VALUE="1"/>
         <PARAMETER NAME="NUM_PORTS" VALUE="2"/>
         <PARAMETER NAME="dout_width" VALUE="10"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_lshift2_a_1"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_lshift2_b_0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
@@ -4641,7 +4641,7 @@
         <PARAMETER NAME="IN9_WIDTH" VALUE="1"/>
         <PARAMETER NAME="NUM_PORTS" VALUE="2"/>
         <PARAMETER NAME="dout_width" VALUE="10"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_lshift2_a_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_lshift2_c_0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
@@ -4663,14 +4663,14 @@
       </PORTS>
       <BUSINTERFACES/>
     </MODULE>
-    <MODULE COREREVISION="2114598331" FULLNAME="/ntt_top_0" HWVERSION="1.0" INSTANCE="ntt_top_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="ntt_top" VLNV="xilinx.com:hls:ntt_top:1.0">
+    <MODULE COREREVISION="2114609983" FULLNAME="/ntt_top_0" HWVERSION="1.0" INSTANCE="ntt_top_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="ntt_top" VLNV="xilinx.com:hls:ntt_top:1.0">
       <DOCUMENTS/>
       <PARAMETERS>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_ntt_top_0_9"/>
-        <PARAMETER NAME="II" VALUE="7640 ~ 8688"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_ntt_top_0_0"/>
+        <PARAMETER NAME="II" VALUE="7570 ~ 8590"/>
         <PARAMETER NAME="clk_period" VALUE="15"/>
         <PARAMETER NAME="combinational" VALUE="0"/>
-        <PARAMETER NAME="latency" VALUE="7639"/>
+        <PARAMETER NAME="latency" VALUE="7569"/>
         <PARAMETER NAME="machine" VALUE="64"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
@@ -4858,7 +4858,7 @@
         <PARAMETER NAME="C_USE_S_AXI_HP2" VALUE="0"/>
         <PARAMETER NAME="C_USE_S_AXI_HP3" VALUE="0"/>
         <PARAMETER NAME="USE_TRACE_DATA_EDGE_DETECTOR" VALUE="0"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_processing_system7_0_1"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_processing_system7_0_0"/>
         <PARAMETER NAME="PCW_ACT_APU_PERIPHERAL_FREQMHZ" VALUE="666.666687"/>
         <PARAMETER NAME="PCW_ACT_CAN0_PERIPHERAL_FREQMHZ" VALUE="23.8095"/>
         <PARAMETER NAME="PCW_ACT_CAN1_PERIPHERAL_FREQMHZ" VALUE="23.8095"/>
@@ -6026,7 +6026,7 @@
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_1_FCLK_CLK0"/>
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="ntt_bd_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="DATA_WIDTH" VALUE="32"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_BRESP" VALUE="1"/>
@@ -6294,7 +6294,7 @@
         <PARAMETER NAME="IN9_WIDTH" VALUE="1"/>
         <PARAMETER NAME="NUM_PORTS" VALUE="4"/>
         <PARAMETER NAME="dout_width" VALUE="4"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconcat_1_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconcat_a_0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
@@ -6459,7 +6459,7 @@
         <PARAMETER NAME="IN9_WIDTH" VALUE="1"/>
         <PARAMETER NAME="NUM_PORTS" VALUE="2"/>
         <PARAMETER NAME="dout_width" VALUE="2"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconcat_0_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconcat_ap_0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
@@ -6614,7 +6614,7 @@
         <PARAMETER NAME="IN9_WIDTH" VALUE="1"/>
         <PARAMETER NAME="NUM_PORTS" VALUE="4"/>
         <PARAMETER NAME="dout_width" VALUE="4"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconcat_a_1"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconcat_b_0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
@@ -6779,7 +6779,7 @@
         <PARAMETER NAME="IN9_WIDTH" VALUE="1"/>
         <PARAMETER NAME="NUM_PORTS" VALUE="4"/>
         <PARAMETER NAME="dout_width" VALUE="4"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconcat_a_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconcat_c_0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
@@ -6816,7 +6816,7 @@
       <PARAMETERS>
         <PARAMETER NAME="CONST_VAL" VALUE="0x0"/>
         <PARAMETER NAME="CONST_WIDTH" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconstant_0_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="ntt_bd_xlconstant_bram_rtsb_0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
