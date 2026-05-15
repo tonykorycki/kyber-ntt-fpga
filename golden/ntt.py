@@ -37,10 +37,9 @@ class NTTConfig:
 
     @classmethod
     def from_params(cls, d: int, q: int) -> 'NTTConfig':
-        # Compute primitive root and powers
         g = int(primitive_root(q))
 
-        # psi is a primitive 2d-th root of unity: psi = g^((q-1)/2d)
+        # psi = g^((q-1)/2d) — primitive 2d-th root of unity
         psi = pow(g, (q - 1) // (2 * d), q)
         assert pow(psi, 2 * d, q) == 1,     "psi is not a 2d-th root of unity"
         assert pow(psi, d, q)     == q - 1, "psi^d must equal -1 mod q"
@@ -49,7 +48,6 @@ class NTTConfig:
         omega = pow(g, (q - 1) // d, q)
         assert pow(omega, d, q) == 1, "omega is not a d-th root of unity"
 
-        # Precompute powers and inverses
         psi_powers     = [pow(psi,         i, q) for i in range(d)]
         inv_psi        = pow(psi, q - 2, q)   # psi^{-1} via Fermat's little theorem
         inv_psi_powers = [pow(inv_psi,     i, q) for i in range(d)]
@@ -77,7 +75,6 @@ class NTTConfig:
 
 
 DEV_CONFIG = NTTConfig.from_params(d=4, q=17)
-# KYBER_CONFIG = NTTConfig.from_params(d=256, q=3329) — addressed separately
 
 
 def barrett_reduce(a: int, b: int, config: NTTConfig) -> int:
@@ -87,8 +84,8 @@ def barrett_reduce(a: int, b: int, config: NTTConfig) -> int:
     m = config.barrett_m
 
     ab        = a * b
-    q_approx  = (ab * m) >> (2 * k)   # approximate quotient floor(ab/q)
-    reduced   = ab - q_approx * q     # ab - floor(ab/q)*q, off by at most q
+    q_approx  = (ab * m) >> (2 * k)
+    reduced   = ab - q_approx * q
 
     # Single correction step — fires at most once
     if reduced < 0:
@@ -129,19 +126,18 @@ def ntt_forward(a_twisted: List[int], config: NTTConfig) -> List[int]:
     q = config.q
     a = bit_reverse(a_twisted, config)   # bit-reversal permutation before in-place CT
 
-    m = 2           # group size m = 2^s, starts at s=1
-    while m <= d:   # log2(d) stages
-        m_half = m // 2                      # m/2 — offset to upper butterfly element
-        for k in range(0, d, m):             # k: group start indices 0, m, 2m, ...
-            for j in range(m_half):          # j: position within lower half of group
-                # wm_j = omega_m^j = omega^(j*n/m)
+    m = 2
+    while m <= d:
+        m_half = m // 2
+        for k in range(0, d, m):
+            for j in range(m_half):
+                # wm_j = omega_m^j = omega^(j*d/m)
                 wm_j = config.omega_powers[j * (d // m)]
-
-                t = barrett_reduce(wm_j, a[k + j + m_half], config)  # t = wm_j * a[k+j+m/2]
+                t = barrett_reduce(wm_j, a[k + j + m_half], config)
                 u = a[k + j]
-                a[k + j]          = (u + t) % q        # CT eq. (11): a[k+j]     = u + t
-                a[k + j + m_half] = (u - t + q) % q   # CT eq. (12): a[k+j+m/2] = u - t
-        m *= 2   # next stage
+                a[k + j]          = (u + t) % q        # CT eq. (11)
+                a[k + j + m_half] = (u - t + q) % q   # CT eq. (12)
+        m *= 2
 
     return a   # now holds A, the NTT of ã
 
@@ -160,18 +156,18 @@ def ntt_inverse(C: List[int], config: NTTConfig) -> List[int]:
     q = config.q
     a = list(C)   # work on a copy; GS reads natural order, bit-reverses output
 
-    m = d           # group size starts at d, halves each stage
-    while m > 1:    # log2(d) stages
-        m_half = m // 2                      # m/2 — offset to upper butterfly element
-        for k in range(0, d, m):             # k: group start indices
-            for j in range(m_half):          # j: position within lower half of group
-                # wm_j = omega_m^{-j} = omega^{-(j*n/m)}
+    m = d
+    while m > 1:
+        m_half = m // 2
+        for k in range(0, d, m):
+            for j in range(m_half):
+                # wm_j = omega_m^{-j} = omega^{-(j*d/m)}
                 wm_j = config.inv_omega_powers[j * (d//m)]
                 t = a[k + j + m_half]
                 u = a[k + j]
-                a[k + j]          = (u + t) % q                          # GS: a[k+j]     = u + t
-                a[k + j + m_half] = barrett_reduce(wm_j, (u - t + q) % q, config)  # GS: a[k+j+m/2] = wm_j * (u - t)
-        m //= 2   # next stage
+                a[k + j]          = (u + t) % q                                    # GS eq.
+                a[k + j + m_half] = barrett_reduce(wm_j, (u - t + q) % q, config)  # GS eq.
+        m //= 2
 
     # GS outputs in bit-reversed order; permute back, then scale by d^{-1}
     a = bit_reverse(a, config)

@@ -131,9 +131,6 @@ def _validate(n: int, q: int, zeta: int) -> None:
 KYBER_256 = KyberNTTConfig.from_params(n=256, q=3329, zeta=17)
 
 
-# ---------------------------------------------------------------------------
-# Primitives
-# ---------------------------------------------------------------------------
 
 def barrett_reduce(a: int, b: int, config: KyberNTTConfig) -> int:
     """Return (a * b) mod q using Barrett reduction. Mirrors the HLS barrett.cpp logic."""
@@ -171,10 +168,8 @@ def gs_butterfly(a: int, b: int, zeta: int, config: KyberNTTConfig) -> tuple:
     return (a + b) % config.q, (zeta * (b - a + config.q)) % config.q
 
 
-# ---------------------------------------------------------------------------
-# FIPS 203 Algorithm 9 — NTT forward
-# ---------------------------------------------------------------------------
 
+# FIPS 203 Algorithm 9 — forward NTT
 def ntt_forward(f: List[int], config: KyberNTTConfig = KYBER_256) -> List[int]:
     """Forward NTT (FIPS 203 Algorithm 9). Returns a new N-element list."""
     assert len(f) == config.n
@@ -193,10 +188,8 @@ def ntt_forward(f: List[int], config: KyberNTTConfig = KYBER_256) -> List[int]:
     return f
 
 
-# ---------------------------------------------------------------------------
-# FIPS 203 Algorithm 10 — NTT inverse
-# ---------------------------------------------------------------------------
 
+# FIPS 203 Algorithm 10 — inverse NTT
 def ntt_inverse(f: List[int], config: KyberNTTConfig = KYBER_256) -> List[int]:
     """Inverse NTT (FIPS 203 Algorithm 10). Returns a new N-element list."""
     assert len(f) == config.n
@@ -215,10 +208,8 @@ def ntt_inverse(f: List[int], config: KyberNTTConfig = KYBER_256) -> List[int]:
     return [x * config.inv_half_n % config.q for x in f]
 
 
-# ---------------------------------------------------------------------------
-# FIPS 203 Algorithm 11 — BaseCaseMultiply
-# ---------------------------------------------------------------------------
 
+# FIPS 203 Algorithm 11 — BaseCaseMultiply
 def base_case_mul(a0: int, a1: int, b0: int, b1: int,
                   gamma: int, config: KyberNTTConfig = KYBER_256) -> tuple:
     """Multiply (a0 + a1*x)(b0 + b1*x) mod (x^2 - gamma) in Z_Q[x].
@@ -259,10 +250,8 @@ def schoolbook_mul(a: List[int], b: List[int],
     return result
 
 
-# ---------------------------------------------------------------------------
-# Compatibility wrappers — same signatures as ntt.py Kyber functions
-# ---------------------------------------------------------------------------
 
+# Compatibility wrappers — same signatures as ntt.py
 def kyber_ntt(f: List[int], q: int = 3329) -> List[int]:
     assert q == 3329, "kyber_ntt is only defined for q=3329"
     return ntt_forward(f, KYBER_256)
@@ -283,9 +272,6 @@ def kyber_schoolbook(a: List[int], b: List[int], q: int = 3329) -> List[int]:
     return schoolbook_mul(a, b, KYBER_256)
 
 
-# ---------------------------------------------------------------------------
-# Twiddle schedules (for inspection / testing)
-# ---------------------------------------------------------------------------
 
 def ntt_twiddle_schedule(config: KyberNTTConfig = KYBER_256) -> list:
     """Return the N/2-1 (len, start, zeta) triples in NTT order."""
@@ -317,9 +303,6 @@ def intt_twiddle_schedule(config: KyberNTTConfig = KYBER_256) -> list:
     return schedule
 
 
-# ---------------------------------------------------------------------------
-# Test vector generation
-# ---------------------------------------------------------------------------
 
 def generate_vectors(n_vectors: int, out_path: str, seed: int = 42,
                      config: KyberNTTConfig = KYBER_256) -> None:
@@ -340,9 +323,6 @@ def generate_vectors(n_vectors: int, out_path: str, seed: int = 42,
     print(f'Wrote {n_vectors} vectors to {out_path}  (n={config.n}, q={config.q}, zeta={config.zeta})')
 
 
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

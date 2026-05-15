@@ -101,7 +101,6 @@ int main(int argc, char *argv[])
         perror("mmap"); return 1;
     }
 
-    // Set GPIO direction: Ch1 all outputs, Ch2 all inputs
     gwrite(GPIO_CH1_TRI, 0x0);
     gwrite(GPIO_CH2_TRI, 0x3);
 

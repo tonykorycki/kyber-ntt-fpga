@@ -29,9 +29,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'golden'))
 from kyber_ntt import KyberNTTConfig, bit_revK, zeta_pow
 
 
-# ---------------------------------------------------------------------------
-# Validation
-# ---------------------------------------------------------------------------
 
 def validate_params(n: int, q: int) -> None:
     """Abort with a clear message if (n, q) cannot support a Kyber-style NTT."""
@@ -66,9 +63,6 @@ def validate_params(n: int, q: int) -> None:
         )
 
 
-# ---------------------------------------------------------------------------
-# Twiddle computation
-# ---------------------------------------------------------------------------
 
 def compute_twiddles(cfg: KyberNTTConfig):
     """Return (TWIDDLE, SLOT_ZETA, INV_N) for the given config.
@@ -104,9 +98,6 @@ def self_test(cfg: KyberNTTConfig, twiddle: list, slot_zeta: list, inv_n: int) -
           f"(TWIDDLE[0]={twiddle[0]}, SLOT_ZETA[0]={slot_zeta[0]}, INV_N={inv_n})")
 
 
-# ---------------------------------------------------------------------------
-# ntt_engine.h
-# ---------------------------------------------------------------------------
 
 def update_ntt_engine_h(n: int, q: int, hls_dir: str) -> None:
     """Rewrite the four #define lines in ntt_engine.h for the given (n, q)."""
@@ -130,9 +121,6 @@ def update_ntt_engine_h(n: int, q: int, hls_dir: str) -> None:
     print(f'Updated  {path}  (N={n}, Q={q}, COEF_W={coef_w}, LOG2_N={log2_n})')
 
 
-# ---------------------------------------------------------------------------
-# twiddle_rom.h
-# ---------------------------------------------------------------------------
 
 def gen_twiddle_rom_h(twiddle: list, slot_zeta: list, inv_n: int,
                       n: int, q: int, hls_dir: str) -> None:
@@ -158,9 +146,6 @@ def gen_twiddle_rom_h(twiddle: list, slot_zeta: list, inv_n: int,
     print(f'Wrote    {path}')
 
 
-# ---------------------------------------------------------------------------
-# Vivado .coe files
-# ---------------------------------------------------------------------------
 
 def gen_coe_files(twiddle: list, slot_zeta: list, vivado_dir: str) -> None:
     def coe(values: list) -> str:
@@ -177,9 +162,6 @@ def gen_coe_files(twiddle: list, slot_zeta: list, vivado_dir: str) -> None:
         print(f'Wrote    {path}')
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

@@ -18,7 +18,6 @@
 #define NTT_COEF_W  12       // bit width of one coef    (full Kyber: 12)
 #define NTT_LOG2_N  8       // log2(NTT_N)              (full Kyber: 8)
 
-// C++ aliases
 constexpr int N      = NTT_N;
 constexpr int Q      = NTT_Q;
 constexpr int COEF_W = NTT_COEF_W;
