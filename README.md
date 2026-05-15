@@ -16,12 +16,13 @@ complete hardware-accelerated Kyber-512 key exchange with charts.
 
 | Metric | Value |
 |---|---|
-| End-to-end compute (NTT(a) ∥ NTT(b) → mul → INTT) | **7,639–8,687 cycles** |
+| End-to-end compute (NTT(a) ∥ NTT(b) → mul → INTT) | **7,569–8,589 cycles** |
 | Latency @ 100 MHz (measured, ap_start → ap_idle) | **~133 µs** |
-| Per-multiply speedup vs ARM Cortex-A9 Python | **~400×** |
-| Timing closure (WNS) | 0.097 ns @ 100 MHz |
-| LUT utilization | 7,552 / 53,200 (14%) |
-| FF utilization | 7,858 / 106,400 (7%) |
+| Per-multiply speedup vs ARM Cortex-A9 Python | **412×** |
+| End-to-end Kyber-512 KEM speedup | **3.1×** (301 ms vs 923 ms, 12 multiplications) |
+| Timing closure (WNS) | 0.204 ns @ 100 MHz |
+| LUT utilization | 7,140 / 53,200 (13%) |
+| FF utilization | 7,364 / 106,400 (7%) |
 | DSP utilization | 33 / 220 (15%) |
 | BRAM tiles | 6 / 140 (4%) |
 | Pipeline II (NTT butterfly loop) | 4 (floor set by single-port BRAM: 4 accesses, 1 port) |
