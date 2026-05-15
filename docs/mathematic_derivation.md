@@ -393,7 +393,7 @@ for len in 128, 64, 32, 16, 8, 4, 2:
 
 ### 10.4 Base-Case Multiplication in $\mathbb{Z}_q[x]/(x^2-\gamma)$ (FIPS 203 Algorithm 11)
 
-After the forward NTT, each pair $(A[2i],\, A[2i+1])$ represents $a_0+a_1 x \in \mathbb{Z}_q[x]/(x^2-\gamma_i)$, where $\gamma_i = \text{SLOT\_ZETA}[i] = \zeta^{2 \cdot \mathrm{brv}_7(i)+1}$. Multiplying two such elements:
+After the forward NTT, each pair $(A[2i],\, A[2i+1])$ represents $a_0+a_1 x \in \mathbb{Z}_q[x]/(x^2-\gamma_i)$, where $\gamma_i = \texttt{SLOT\_ZETA}[i] = \zeta^{2 \cdot \mathrm{brv}_7(i)+1}$. Multiplying two such elements:
 
 ```math
 (a_0 + a_1 x)(b_0 + b_1 x) \bmod (x^2 - \gamma) \;=\; (a_0 b_0 + a_1 b_1 \gamma) + (a_0 b_1 + a_1 b_0)\,x
@@ -410,7 +410,7 @@ for i in 0..N/2−1:
 
 ### 10.5 The Inverse NTT (FIPS 203 Algorithm 10)
 
-The inverse NTT reconstructs $c \in \mathbb{Z}_q[x]/(x^N+1)$ from its $128$ CRT residues. The butterfly runs in reverse: stages proceed $\text{len}=2, 4, \ldots, 128$ (Gentleman-Sande), and the TWIDDLE table is traversed in reverse ($k$ counting down from $N/2-2$ to $0$). The scaling factor is $\text{INV\_N} = (N/2)^{-1} \bmod Q$, applied to every coefficient after all stages.
+The inverse NTT reconstructs $c \in \mathbb{Z}_q[x]/(x^N+1)$ from its $128$ CRT residues. The butterfly runs in reverse: stages proceed $\text{len}=2, 4, \ldots, 128$ (Gentleman-Sande), and the TWIDDLE table is traversed in reverse ($k$ counting down from $N/2-2$ to $0$). The scaling factor is $\texttt{INV\_N} = (N/2)^{-1} \bmod Q$, applied to every coefficient after all stages.
 
 The scaling by $N/2$ (not $N$) reflects that the $7$-stage NTT computes $N/2$ two-point sub-problems, each contributing a factor of $2$.
 
