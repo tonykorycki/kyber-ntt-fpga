@@ -5,9 +5,9 @@ arithmetic primitive of CRYSTALS-Kyber (FIPS 203 / ML-KEM). Implemented in Vitis
 via Vivado block design, and deployed on a PYNQ-Z2 (Zynq-7000 SoC).
 
 The full Kyber KEM protocol runs on the ARM PS; every polynomial multiply is offloaded to the PL
-via memory-mapped BRAM. No OS drivers, no DMA — just `/dev/mem` and a C binary.
+via memory-mapped BRAM using `/dev/mem` and a C binary.
 
-**[Live demo notebook →](ps/kyber_demo.ipynb)** — benchmarks, correctness proofs, and a
+**[Live demo notebook →](ps/kyber_demo.ipynb)** : benchmarks, correctness proofs, and a
 complete hardware-accelerated Kyber-512 key exchange with charts.
 
 ---
@@ -43,13 +43,13 @@ PS (ARM Cortex-A9, Linux)          PL (FPGA Fabric)
   /dev/mem + mmap()                │  ntt_top HLS IP (ap_ctrl_hs)    │
                                    │  ┌──────────┐  ┌─────────────┐  │
   write a[] → BRAM A ─Port A──────►│  │ntt_engine│  │ntt_engine   │  │
-  write b[] → BRAM B ─Port A──────►│  │  NTT(a)  │  │  NTT(b)    │  │
+  write b[] → BRAM B ─Port A──────►│  │  NTT(a)  │  │  NTT(b)     │  │
                                    │  └────┬─────┘  └──────┬──────┘  │
-  GPIO: pulse ap_start             │       └───────┬────────┘         │
-  GPIO: poll ap_idle  ◄────────────│           mul_ntt                │
-                                   │           INTT(c)                │
-  read c[] ← BRAM C ──Port A──────◄│                                  │
-                                   └──────────────────────────────────┘
+  GPIO: pulse ap_start             │       └───────┬────────┘        │
+  GPIO: poll ap_idle  ◄────────────│           mul_ntt               │
+                                   │           INTT(c)               │
+  read c[] ← BRAM C ──Port A──────◄│                                 │
+                                   └─────────────────────────────────┘
        │                                    │ Port B (HLS)
        ▼                                    ▼
   AXI BRAM Controllers              True Dual-Port BRAMs (A, B, C)
@@ -62,7 +62,7 @@ PS (ARM Cortex-A9, Linux)          PL (FPGA Fabric)
 | Layer | Language | Responsibility |
 |---|---|---|
 | HLS | Vitis HLS (C++) | All arithmetic: Barrett mul, CT/GS butterfly, slot multiply, sequencing |
-| Block design | Vivado TCL | BRAM wiring, AXI interconnect, GPIO, PS config — no hand-written RTL |
+| Block design | Vivado TCL | BRAM wiring, AXI interconnect, GPIO, PS config |
 | PS driver | C | `/dev/mem` BRAM access, GPIO control, Kyber KEM protocol |
 
 Control is routed through AXI GPIO rather than `s_axilite` because `ap_ctrl_hs` exposes
@@ -102,7 +102,14 @@ python test_kyber_ntt.py          # 13 unit tests
 python kyber_ntt.py --trials 50   # self-test with 50 random polynomials
 ```
 
-**RTL simulation — requires WSL/Linux with Verilator and cocotb:**
+**RTL simulation - requires WSL/Linux with Verilator and cocotb:**
+```bash
+make sim
+```
+(can specify number of test vectors and whether to produce waveforms using NTT_MAX_VECTORS=N and WAVES=0/1)
+
+or
+
 ```bash
 cd sim
 source ~/cocotb-venv/bin/activate
@@ -124,6 +131,9 @@ cd ps && make
 sudo ./ntt_driver -t                          # latency benchmark
 echo "<a coeffs> <b coeffs>" | sudo ./ntt_driver   # single multiply
 ```
+(make sure to load the new bitstream first)
+
+or use the notebook in ps/ on the board to automatically pass in vectors and visualize outputs
 
 ---
 
@@ -159,4 +169,4 @@ BRAM interface (2 reads + 2 writes per butterfly, 1 port). A bit-reversed memory
 allow II=1 and ~3–4× speedup.
 
 **Direct BRAM access.** Coefficient arrays live in on-chip BRAM. The PS reads and writes
-directly through AXI BRAM Controllers — no DMA, no cache flush, no PYNQ overlay required.
+directly through AXI BRAM Controllers (no DMA, no cache flush, no PYNQ overlay required).
