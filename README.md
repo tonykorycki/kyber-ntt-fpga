@@ -84,56 +84,65 @@ idle) with no additional mux logic.
 
 Four independent layers, each checking against the Python golden model:
 
-| Stage | Tool | Coverage |
+| Stage | Tool | Result |
 |---|---|---|
-| Golden model | Python (`golden/kyber_ntt.py`) | 13 unit tests: Barrett, butterflies, roundtrip, poly_mul vs schoolbook |
-| HLS C-simulation | Vitis HLS (`hls/tb/tb_ntt_top.cpp`) | Full pipeline against test vectors before synthesis |
-| RTL simulation | Cocotb + Verilator (`sim/test_ntt_top.py`) | 64 random vectors through HLS-generated Verilog, Python BRAM models |
-| Hardware | C driver (`ps/ntt_driver.c`) | Same 64 vectors on PYNQ-Z2; latency measured with `clock_gettime` |
+| Golden model | Python (`golden/kyber_ntt.py`) | **13/13 tests pass** - Barrett, butterflies, roundtrip, poly_mul vs schoolbook |
+| HLS C-simulation | Vitis HLS (`hls/tb/tb_ntt_top.cpp`) | **All vectors pass** - full pipeline checked against golden model before synthesis |
+| RTL simulation | Cocotb + Icarus Verilog (`sim/test_ntt_top.py`) | **64/64 vectors pass** - HLS-generated Verilog with Python BRAM models (`sim/results.xml`) |
+| Hardware | C driver (`ps/ntt_driver.c`) | **Pass** - coefficient-by-coefficient match against golden model on PYNQ-Z2; 133 µs measured |
 
 ---
 
 ## Quick Start
 
-**Golden model — runs anywhere:**
-```bash
-cd golden
-python test_kyber_ntt.py          # 13 unit tests
-python kyber_ntt.py --trials 50   # self-test with 50 random polynomials
-```
-
-**RTL simulation - requires WSL/Linux with Verilator and cocotb:**
-```bash
-make sim
-```
-(can specify number of test vectors and whether to produce waveforms using NTT_MAX_VECTORS=N and WAVES=0/1)
-
-or
+### Full build (Windows, Vitis HLS 2025.1 + Vivado 2025.1 + WSL required)
 
 ```bash
-cd sim
-source ~/cocotb-venv/bin/activate
-NTT_MAX_VECTORS=3 make            # quick smoke test (3 vectors)
-make                              # full run, 64 vectors (~6 min)
-NTT_MAX_VECTORS=1 make WAVES=1   # single vector + VCD waveform
+make all        # golden model → HLS C-sim → HLS synthesis → RTL sim → Vivado impl → export
+make help       # list individual targets
 ```
 
-**Retarget to any valid (N, Q):**
+### Step by step
+
+**1. Golden model — runs anywhere, no tools required:**
+```bash
+make golden     # 13 unit tests, dev params (n=4, q=17)
+make golden-kyber  # same tests with full Kyber params (n=256, q=3329)
+```
+
+**2. HLS C-simulation — requires Vitis HLS 2025.1:**
+```bash
+make hls-csim   # full pipeline tb_ntt_top against golden test vectors
+```
+
+**3. RTL simulation — requires WSL with Icarus Verilog and cocotb:**
+```bash
+make sim                          # 64 vectors, ~6 min
+make sim NTT_MAX_VECTORS=3        # quick smoke test
+make sim NTT_MAX_VECTORS=1 WAVES=1  # single vector + VCD waveform (open with GTKWave)
+```
+
+**4. HLS synthesis + Vivado implementation — requires Vitis HLS 2025.1 + Vivado 2025.1:**
+```bash
+make bitstream   # hls-synth → vivado-impl → export (exports to bitstream/)
+```
+To recreate only the block design TCL (not re-synthesize): `source vivado/ntt_bd.tcl` in the Vivado Tcl console.
+
+**5. Hardware — PYNQ-Z2 only:**
+```bash
+# Copy bitstream/ntt_bd.bit and bitstream/ntt_bd.hwh to the board, then:
+cd ps && make
+sudo ./ntt_driver -t                               # latency benchmark
+```
+Or open `ps/kyber_demo.ipynb` on the board for the full benchmarked demo.
+
+### Retarget to any (N, Q)
+
 ```bash
 python scripts/gen_twiddle_rom.py --n 256 --q 3329   # full Kyber
 python scripts/gen_twiddle_rom.py --n 4   --q 17     # dev params
-# then re-run HLS synthesis
+# then re-run: make hls-csim hls-synth sim vivado-impl export
 ```
-
-**Hardware (PYNQ-Z2 only):**
-```bash
-cd ps && make
-sudo ./ntt_driver -t                          # latency benchmark
-echo "<a coeffs> <b coeffs>" | sudo ./ntt_driver   # single multiply
-```
-(make sure to load the new bitstream first)
-
-or use the notebook in ps/ on the board to automatically pass in vectors and visualize outputs
 
 ---
 
@@ -154,7 +163,6 @@ or use the notebook in ps/ on the board to automatically pass in vectors and vis
 ### Documentation
 
 - [`docs/mathematic_derivation.md`](docs/mathematic_derivation.md) — NTT theory, CT/GS butterfly equations, Barrett reduction, twist proof, Kyber-native factorisation and base-case multiply derivation
-- [`docs/initial_plan.md`](docs/initial_plan.md) — original architecture proposal
 - [`docs/detailed_plan.md`](docs/detailed_plan.md) — module interfaces, pragma strategy, milestone tracking
 
 ---
